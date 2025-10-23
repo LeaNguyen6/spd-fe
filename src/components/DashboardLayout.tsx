@@ -2,10 +2,11 @@ import { ReactNode } from "react";
 import { LayoutDashboard, Wrench, TrendingUp, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { type UserRole } from "@/types/roles";
 
 interface DashboardLayoutProps {
   children: ReactNode;
-  userRole: "assets" | "maintenance" | "reliability";
+  userRole: UserRole;
   onLogout: () => void;
 }
 

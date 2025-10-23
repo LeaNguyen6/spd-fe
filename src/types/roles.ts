@@ -1,0 +1,1 @@
+export type UserRole = "assets" | "maintenance" | "reliability";

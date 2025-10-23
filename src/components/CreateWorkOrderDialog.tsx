@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
-import { mockSapApi } from "@/services/mockSapApi";
+import { apiService, logApiUsage } from "@/services/index";
 import { toast } from "@/hooks/use-toast";
 import { z } from "zod";
 
@@ -48,9 +48,10 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProp
       const validated = workOrderSchema.parse(formData);
 
       setLoading(true);
-      
-      // Create work order via mock SAP API
-      await mockSapApi.createWorkOrder({
+      logApiUsage("Creating work order");
+
+      // Create work order via API service
+      await apiService.createWorkOrder({
         assetName: validated.assetName,
         type: validated.type,
         priority: validated.priority,
@@ -69,7 +70,7 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProp
       });
       setOpen(false);
       onWorkOrderCreated();
-      
+
     } catch (error) {
       if (error instanceof z.ZodError) {
         const fieldErrors: Record<string, string> = {};

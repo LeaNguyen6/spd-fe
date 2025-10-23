@@ -1,98 +1,98 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LayoutDashboard, Wrench, TrendingUp } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { ArrowRight, Shield, Zap, Users, BarChart3 } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [selectedRole, setSelectedRole] = useState<"assets" | "maintenance" | "reliability" | null>(null);
 
-  const roles = [
+  const features = [
     {
-      id: "assets" as const,
-      title: "Asset Manager",
-      description: "Monitor asset health and manage replacement planning",
-      icon: LayoutDashboard,
+      icon: BarChart3,
+      title: "Asset Health Monitoring",
+      description: "Real-time monitoring and predictive analytics for your industrial assets",
     },
     {
-      id: "maintenance" as const,
-      title: "Maintenance Planner",
-      description: "Schedule and optimize maintenance operations",
-      icon: Wrench,
+      icon: Zap,
+      title: "Predictive Maintenance",
+      description: "AI-powered predictions to prevent failures and optimize maintenance schedules",
     },
     {
-      id: "reliability" as const,
-      title: "Reliability Engineer",
-      description: "Analyze performance and optimize maintenance strategies",
-      icon: TrendingUp,
+      icon: Users,
+      title: "Role-Based Access",
+      description: "Tailored dashboards for Asset Managers, Maintenance Planners, and Reliability Engineers",
+    },
+    {
+      icon: Shield,
+      title: "SAP Integration",
+      description: "Seamless integration with SAP PM for centralized asset management",
     },
   ];
 
-  const handleLogin = () => {
-    if (!selectedRole) {
-      toast({
-        title: "Please select a role",
-        description: "Choose your role to continue",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    localStorage.setItem("userRole", selectedRole);
-    navigate("/dashboard");
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
-      <Card className="w-full max-w-4xl shadow-elegant">
-        <CardHeader className="text-center space-y-2 pb-6">
-          <CardTitle className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            AssetAI Platform
-          </CardTitle>
-          <CardDescription className="text-lg">
-            Select your role to access the dashboard
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-3">
-            {roles.map((role) => {
-              const Icon = role.icon;
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      {/* Hero Section */}
+      <div className="flex items-center justify-center min-h-screen p-4">
+        <div className="w-full max-w-6xl mx-auto">
+          <div className="text-center space-y-6 mb-12">
+            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              AssetAI Platform
+            </h1>
+            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
+              Intelligent Asset Management with AI-Powered Predictive Maintenance
+            </p>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Transform your industrial operations with smart asset monitoring, predictive analytics,
+              and seamless SAP PM integration.
+            </p>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+            <Button
+              onClick={() => navigate("/signin")}
+              size="lg"
+              className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-8"
+            >
+              Sign In
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+            <Button
+              onClick={() => navigate("/signup")}
+              variant="outline"
+              size="lg"
+              className="px-8"
+            >
+              Create Account
+            </Button>
+
+          </div>
+
+          {/* Features Grid */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-12">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
               return (
-                <Card
-                  key={role.id}
-                  className={`cursor-pointer transition-all hover:shadow-lg ${
-                    selectedRole === role.id
-                      ? "ring-2 ring-primary bg-primary/5"
-                      : "hover:bg-accent/50"
-                  }`}
-                  onClick={() => setSelectedRole(role.id)}
-                >
-                  <CardHeader className="text-center space-y-3">
-                    <div className="mx-auto w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center">
+                <Card key={index} className="border-primary/10 shadow-lg hover:shadow-xl transition-shadow">
+                  <CardHeader className="text-center">
+                    <div className="mx-auto w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center mb-4">
                       <Icon className="w-6 h-6 text-primary-foreground" />
                     </div>
-                    <CardTitle className="text-lg">{role.title}</CardTitle>
-                    <CardDescription className="text-sm">
-                      {role.description}
-                    </CardDescription>
+                    <CardTitle className="text-lg">{feature.title}</CardTitle>
                   </CardHeader>
+                  <CardContent>
+                    <CardDescription className="text-center">
+                      {feature.description}
+                    </CardDescription>
+                  </CardContent>
                 </Card>
               );
             })}
           </div>
 
-          <Button
-            onClick={handleLogin}
-            className="w-full bg-gradient-primary hover:opacity-90 text-primary-foreground"
-            size="lg"
-          >
-            Continue to Dashboard
-          </Button>
-        </CardContent>
-      </Card>
+
+        </div>
+      </div>
     </div>
   );
 };
