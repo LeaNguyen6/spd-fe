@@ -1,18 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
-import { apiService, logApiUsage } from "@/services/index";
+import { apiService, logApiUsage, isUsingMockApi, type Asset } from "@/services/index";
 import { toast } from "@/hooks/use-toast";
 import { z } from "zod";
+import dayjs from "dayjs";
 
 const workOrderSchema = z.object({
   assetName: z.string().trim().min(1, "Asset name is required").max(100, "Asset name too long"),
   type: z.string().trim().min(1, "Work order type is required").max(100, "Type too long"),
-  priority: z.enum(["critical", "high", "medium", "low"], { required_error: "Priority is required" }),
+  priority: z.enum(["CRITICAL", "HIGH", "MEDIUM", "LOW"], { required_error: "Priority is required" }),
   assignedTo: z.string().trim().min(1, "Assigned to is required").max(100, "Name too long"),
   scheduledDate: z.string().min(1, "Scheduled date is required"),
 });
@@ -24,20 +25,41 @@ interface CreateWorkOrderDialogProps {
 const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProps) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [assets, setAssets] = useState<Asset[]>([]);
   const [formData, setFormData] = useState<{
     assetName: string;
     type: string;
-    priority: "critical" | "high" | "medium" | "low";
+    priority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
     assignedTo: string;
     scheduledDate: string;
   }>({
     assetName: "",
     type: "",
-    priority: "medium",
+    priority: "MEDIUM",
     assignedTo: "",
     scheduledDate: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Fetch assets when component mounts
+  useEffect(() => {
+    const loadAssets = async () => {
+      try {
+        logApiUsage("Loading assets for work order creation");
+        const assetsData = await apiService.getAssets();
+        setAssets(assetsData);
+      } catch (error) {
+        console.error("Failed to load assets:", error);
+        toast({
+          title: "Warning",
+          description: "Failed to load assets list",
+          variant: "destructive",
+        });
+      }
+    };
+
+    loadAssets();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,26 +72,38 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProp
       setLoading(true);
       logApiUsage("Creating work order");
 
+      // Format the scheduled date using dayjs
+      const formattedDate = dayjs(validated.scheduledDate).format();
+
+      // Convert priority to lowercase for API compatibility
+
       // Create work order via API service
+      // Provide both mock and real API formats to satisfy the union type
       await apiService.createWorkOrder({
+        // Mock API format (camelCase)
         assetName: validated.assetName,
         type: validated.type,
         priority: validated.priority,
         assignedTo: validated.assignedTo,
-        scheduledDate: validated.scheduledDate,
+        scheduledDate: formattedDate,
         status: "pending",
+        // Real API format (snake_case)
+        asset_id: validated.assetName,
+        assigned_to: validated.assignedTo,
+        scheduled_date: formattedDate,
       });
 
       // Reset form and close dialog
       setFormData({
         assetName: "",
         type: "",
-        priority: "medium",
+        priority: "MEDIUM",
         assignedTo: "",
         scheduledDate: "",
       });
-      setOpen(false);
       onWorkOrderCreated();
+
+      setOpen(false);
 
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -119,13 +153,29 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProp
 
           <div className="space-y-2">
             <Label htmlFor="type">Work Order Type</Label>
-            <Input
+            <Select
+              value={formData.type}
+              onValueChange={(value: string) => setFormData({ ...formData, type: value })}
+
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select Work Order Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="FD001">Preventive Maintenance</SelectItem>
+                {/* <SelectItem value="high">High</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="low">Low</SelectItem> */}
+              </SelectContent>
+            </Select>
+
+            {/* <Input
               id="type"
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value })}
               placeholder="e.g., Preventive Maintenance"
               maxLength={100}
-            />
+            /> */}
             {errors.type && <p className="text-sm text-destructive">{errors.type}</p>}
           </div>
 
@@ -133,7 +183,7 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProp
             <Label htmlFor="priority">Priority</Label>
             <Select
               value={formData.priority}
-              onValueChange={(value: "critical" | "high" | "medium" | "low") =>
+              onValueChange={(value: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW") =>
                 setFormData({ ...formData, priority: value })
               }
             >
@@ -141,10 +191,10 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProp
                 <SelectValue placeholder="Select priority" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="critical">Critical</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="CRITICAL">Critical</SelectItem>
+                <SelectItem value="HIGH">High</SelectItem>
+                <SelectItem value="MEDIUM">Medium</SelectItem>
+                <SelectItem value="LOW">Low</SelectItem>
               </SelectContent>
             </Select>
             {errors.priority && <p className="text-sm text-destructive">{errors.priority}</p>}

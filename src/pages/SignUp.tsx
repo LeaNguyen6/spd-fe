@@ -22,8 +22,7 @@ const registerSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters").max(50, "Name is too long"),
     email: z.string().email("Please enter a valid email address"),
     password: z.string()
-        .min(6, "Password must be at least 6 characters")
-        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Password must contain at least one uppercase letter, one lowercase letter, and one number"),
+        .min(6, "Password must be at least 6 characters"),
     role: z.enum(["assets", "maintenance", "reliability"], {
         required_error: "Please select your role",
     }),

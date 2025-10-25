@@ -8,10 +8,9 @@ import { Button } from "@/components/ui/button";
 interface AssetManagerDashboardProps {
     assets: Asset[];
     syncing: boolean;
-    onSyncSap: () => Promise<void>;
 }
 
-const AssetManagerDashboard = ({ assets, syncing, onSyncSap }: AssetManagerDashboardProps) => {
+const AssetManagerDashboard = ({ assets, syncing, }: AssetManagerDashboardProps) => {
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-start">
@@ -19,7 +18,7 @@ const AssetManagerDashboard = ({ assets, syncing, onSyncSap }: AssetManagerDashb
                     <h2 className="text-3xl font-bold mb-2">Asset Manager Dashboard</h2>
                     <p className="text-muted-foreground">Monitor asset health and manage replacement planning</p>
                 </div>
-                <Button onClick={onSyncSap} disabled={syncing} variant="outline">
+                <Button disabled={syncing} variant="outline">
                     <RefreshCw className={`w-4 h-4 mr-2 ${syncing ? "animate-spin" : ""}`} />
                     Refresh
                 </Button>

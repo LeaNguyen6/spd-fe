@@ -13,16 +13,17 @@ const Dashboard = () => {
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     const role = localStorage.getItem("userRole") as UserRole | null;
+    console.log('rollll', role)
     if (!role) {
       navigate("/");
     } else {
       setUserRole(role);
-      loadData();
+      // loadData();
     }
   }, [navigate]);
 
@@ -34,6 +35,7 @@ const Dashboard = () => {
         apiService.getAssets(),
         apiService.getWorkOrders(),
       ]);
+      console.log('Assets:', assetsData);
       setAssets(assetsData);
       setWorkOrders(workOrdersData);
     } catch (error) {
@@ -69,25 +71,26 @@ const Dashboard = () => {
     navigate("/");
   };
 
-  if (!userRole || loading) {
+  if (!userRole) {
     return null;
   }
 
   return (
+
     <DashboardLayout userRole={userRole} onLogout={handleLogout}>
+
+      fdsfdsfds
+
       {userRole === "assets" && (
         <AssetManagerDashboard
           assets={assets}
           syncing={syncing}
-          onSyncSap={handleSyncSap}
         />
       )}
 
       {userRole === "maintenance" && (
         <MaintenancePlannerDashboard
-          workOrders={workOrders}
-          syncing={syncing}
-          onSyncSap={handleSyncSap}
+
           onWorkOrderCreated={loadData}
         />
       )}
@@ -96,6 +99,7 @@ const Dashboard = () => {
         <ReliabilityEngineerDashboard />
       )}
     </DashboardLayout>
+
   );
 };
 

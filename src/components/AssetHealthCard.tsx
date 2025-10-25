@@ -7,14 +7,14 @@ interface AssetHealthCardProps {
   assetName: string;
   category: string;
   healthScore: number;
-  failureProbability: number;
+  confidence: number;
   nextMaintenance: string;
 }
 
-const AssetHealthCard = ({ assetName, category, healthScore, failureProbability, nextMaintenance }: AssetHealthCardProps) => {
-  const isHighRisk = failureProbability > 60;
-  const riskLevel = failureProbability > 70 ? "Critical" : failureProbability > 40 ? "High" : "Low";
-  const riskVariant = failureProbability > 70 ? "destructive" : failureProbability > 40 ? "warning" : "success";
+const AssetHealthCard = ({ assetName, category, healthScore, confidence, nextMaintenance }: AssetHealthCardProps) => {
+  const isHighRisk = confidence > 60;
+  const riskLevel = confidence > 70 ? "Critical" : confidence > 40 ? "High" : "Low";
+  const riskVariant = confidence > 70 ? "destructive" : confidence > 40 ? "warning" : "success";
 
   return (
     <Card className="shadow-card hover:shadow-elevated transition-shadow">
@@ -41,9 +41,9 @@ const AssetHealthCard = ({ assetName, category, healthScore, failureProbability,
         <div>
           <div className="flex justify-between text-sm mb-2">
             <span className="text-muted-foreground">Failure Probability</span>
-            <span className="font-semibold">{failureProbability}%</span>
+            <span className="font-semibold">{confidence}%</span>
           </div>
-          <Progress value={failureProbability} className="h-2 [&>div]:bg-destructive" />
+          <Progress value={confidence} className="h-2 [&>div]:bg-destructive" />
         </div>
         <div className="pt-2 border-t">
           <p className="text-sm text-muted-foreground">Next Maintenance</p>

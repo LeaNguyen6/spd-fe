@@ -7,14 +7,15 @@ export interface Asset {
     assetName: string;
     category: string;
     healthScore: number;
-    failureProbability: number;
+    confidence: number;
     nextMaintenance: string;
     sapEquipmentNumber?: string;
 }
 
 export interface WorkOrder {
     id: string;
-    assetName: string;
+    // assetName: string;
+    assetId: string;
     type: string;
     priority: "critical" | "high" | "medium" | "low";
     assignedTo: string;
@@ -24,12 +25,13 @@ export interface WorkOrder {
 }
 
 export interface CreateWorkOrderRequest {
-    assetName: string;
+    asset_id: string;
     type: string;
     priority: "critical" | "high" | "medium" | "low";
-    assignedTo: string;
-    scheduledDate: string;
-    status: "pending" | "in-progress" | "completed";
+    assigned_to: string;
+    scheduled_date: string;
+    sap_order_number?: string;
+    status?: "pending" | "in-progress" | "completed";
 }
 
 export interface SystemStats {
@@ -47,19 +49,19 @@ export interface SyncResult {
 export const sapApi = {
     // Get all assets from SAP PM
     async getAssets(): Promise<Asset[]> {
-        const response: AxiosResponse<Asset[]> = await apiClient.get('/sap/assets');
+        const response: AxiosResponse<Asset[]> = await apiClient.get('/v1/list-asset');
         return response.data;
     },
 
     // Get all work orders from SAP PM
     async getWorkOrders(): Promise<WorkOrder[]> {
-        const response: AxiosResponse<WorkOrder[]> = await apiClient.get('/sap/work-orders');
+        const response: AxiosResponse<WorkOrder[]> = await apiClient.get('/v1/work-orders');
         return response.data;
     },
 
     // Create a new work order in SAP PM
     async createWorkOrder(workOrder: CreateWorkOrderRequest): Promise<WorkOrder> {
-        const response: AxiosResponse<WorkOrder> = await apiClient.post('/sap/work-orders', workOrder);
+        const response: AxiosResponse<WorkOrder> = await apiClient.post('/v1/work-orders', workOrder);
         return response.data;
     },
 

@@ -8,7 +8,7 @@ export interface Asset {
   assetName: string;
   category: string;
   healthScore: number;
-  failureProbability: number;
+  confidence: number;
   nextMaintenance: string;
   sapEquipmentNumber?: string;
 }
@@ -26,10 +26,10 @@ export interface WorkOrder {
 
 // Mock data storage
 let mockAssets: Asset[] = [
-  { assetId: "A-301", assetName: "Turbine Unit A-301", category: "Rotating Equipment", healthScore: 72, failureProbability: 35, nextMaintenance: "Dec 28, 2025", sapEquipmentNumber: "EQP-10001" },
-  { assetId: "B-142", assetName: "Pump System B-142", category: "Hydraulic Systems", healthScore: 45, failureProbability: 78, nextMaintenance: "Oct 22, 2025", sapEquipmentNumber: "EQP-10002" },
-  { assetId: "C-205", assetName: "Compressor C-205", category: "Pressure Systems", healthScore: 88, failureProbability: 18, nextMaintenance: "Jan 15, 2026", sapEquipmentNumber: "EQP-10003" },
-  { assetId: "D-112", assetName: "Heat Exchanger D-112", category: "Thermal Equipment", healthScore: 61, failureProbability: 52, nextMaintenance: "Nov 10, 2025", sapEquipmentNumber: "EQP-10004" },
+  { assetId: "A-301", assetName: "Turbine Unit A-301", category: "Rotating Equipment", healthScore: 72, confidence: 35, nextMaintenance: "Dec 28, 2025", sapEquipmentNumber: "EQP-10001" },
+  { assetId: "B-142", assetName: "Pump System B-142", category: "Hydraulic Systems", healthScore: 45, confidence: 78, nextMaintenance: "Oct 22, 2025", sapEquipmentNumber: "EQP-10002" },
+  { assetId: "C-205", assetName: "Compressor C-205", category: "Pressure Systems", healthScore: 88, confidence: 18, nextMaintenance: "Jan 15, 2026", sapEquipmentNumber: "EQP-10003" },
+  { assetId: "D-112", assetName: "Heat Exchanger D-112", category: "Thermal Equipment", healthScore: 61, confidence: 52, nextMaintenance: "Nov 10, 2025", sapEquipmentNumber: "EQP-10004" },
 ];
 
 const mockWorkOrders: WorkOrder[] = [
@@ -105,7 +105,7 @@ export const mockSapApi = {
     mockAssets = mockAssets.map(asset => ({
       ...asset,
       healthScore: Math.max(20, Math.min(100, asset.healthScore + Math.floor(Math.random() * 10 - 5))),
-      failureProbability: Math.max(5, Math.min(95, asset.failureProbability + Math.floor(Math.random() * 10 - 5))),
+      confidence: Math.max(5, Math.min(95, asset.confidence + Math.floor(Math.random() * 10 - 5))),
     }));
 
     console.log(`✅ Mock SAP API: Synced ${mockAssets.length} assets from SAP PM`);
