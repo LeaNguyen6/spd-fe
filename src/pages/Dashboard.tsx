@@ -18,12 +18,10 @@ const Dashboard = () => {
 
   useEffect(() => {
     const role = localStorage.getItem("userRole") as UserRole | null;
-    console.log('rollll', role)
     if (!role) {
       navigate("/");
     } else {
       setUserRole(role);
-      // loadData();
     }
   }, [navigate]);
 
@@ -49,22 +47,6 @@ const Dashboard = () => {
     }
   };
 
-  const handleSyncSap = async () => {
-    try {
-      setSyncing(true);
-      logApiUsage("Syncing SAP data");
-      await apiService.syncAssetData();
-      await loadData();
-    } catch (error) {
-      toast({
-        title: "Sync Failed",
-        description: "Failed to sync data with SAP PM",
-        variant: "destructive",
-      });
-    } finally {
-      setSyncing(false);
-    }
-  };
 
   const handleLogout = () => {
     localStorage.removeItem("userRole");
@@ -78,9 +60,6 @@ const Dashboard = () => {
   return (
 
     <DashboardLayout userRole={userRole} onLogout={handleLogout}>
-
-      fdsfdsfds
-
       {userRole === "assets" && (
         <AssetManagerDashboard
           assets={assets}

@@ -45,6 +45,17 @@ export interface SyncResult {
     assetsUpdated: number;
 }
 
+export interface ReliabilityStats {
+    f1_score: number;
+    mean_absolute_error: number;
+    mean_absolute_percentage_error: number;
+    mean_squared_error: number;
+    precision: number[];
+    recall: number[];
+    roc_auc: number[];
+    validation_time: string;
+}
+
 // Real API service using Axios
 export const sapApi = {
     // Get all assets from SAP PM
@@ -127,4 +138,12 @@ export const sapApi = {
         const response: AxiosResponse<WorkOrder[]> = await apiClient.get(`/sap/work-orders/status/${status}`);
         return response.data;
     },
+
+
+    // Get reliability statistics
+    async getReliabilityStats(): Promise<ReliabilityStats> {
+        const response: AxiosResponse<ReliabilityStats> = await apiClient.get('/v1/reliability-stats');
+        return response.data;
+    }
+
 };

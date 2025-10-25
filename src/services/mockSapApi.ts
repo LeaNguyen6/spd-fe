@@ -146,4 +146,26 @@ export const mockSapApi = {
     console.log("✅ Mock SAP API: Retrieved system stats", stats);
     return stats;
   },
+
+  // Get reliability statistics (mock implementation)
+  async getReliabilityStats() {
+    console.log("🔄 Mock SAP API: Fetching reliability statistics");
+
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    const reliabilityStats = {
+      f1_score: 0.94,
+      mean_absolute_error: 0.02,
+      mean_absolute_percentage_error: 0.05,
+      mean_squared_error: 0.001,
+      precision: [0.12, 0.36, 0.58, 0.71, 0.83, 0.91],
+      recall: [0.97, 0.88, 0.76, 0.62, 0.44, 0.25],
+      roc_auc: [0.92, 0.89, 0.85, 0.82, 0.78, 0.74],
+      validation_time: new Date().toISOString(),
+    };
+
+    console.log("✅ Mock SAP API: Retrieved reliability stats", reliabilityStats);
+    return reliabilityStats;
+  },
 };

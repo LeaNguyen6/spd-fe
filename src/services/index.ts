@@ -13,7 +13,14 @@ export const authService = USE_MOCK_API ? mockAuthApi : authApi;
 
 // Re-export types for convenience
 export type { Asset, WorkOrder } from './mockSapApi';
-export type { CreateWorkOrderRequest, SystemStats, SyncResult } from './sapApi';
+export type {
+    CreateWorkOrderRequest,
+    SystemStats,
+    SyncResult,
+    WorkOrder as RealWorkOrder,
+    Asset as RealAsset,
+    ReliabilityStats
+} from './sapApi';
 
 // Utility function to check if using mock API
 export const isUsingMockApi = () => USE_MOCK_API;
