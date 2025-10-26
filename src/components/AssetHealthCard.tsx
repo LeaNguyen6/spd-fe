@@ -7,14 +7,14 @@ interface AssetHealthCardProps {
   assetName: string;
   category: string;
   healthScore: number;
-  failureProbability: number;
+  confidence: number;
   nextMaintenance: string;
 }
 
-const AssetHealthCard = ({ assetName, category, healthScore, failureProbability, nextMaintenance }: AssetHealthCardProps) => {
-  const isHighRisk = failureProbability > 60;
-  const riskLevel = failureProbability > 70 ? "Critical" : failureProbability > 40 ? "High" : "Low";
-  const riskVariant = failureProbability > 70 ? "destructive" : failureProbability > 40 ? "warning" : "success";
+const AssetHealthCard = ({ assetName, category, healthScore, confidence, nextMaintenance }: AssetHealthCardProps) => {
+  const isHighRisk = healthScore > 60;
+  const riskLevel = healthScore > 70 ? "Critical" : healthScore > 40 ? "High" : "Low";
+  const riskVariant = healthScore > 70 ? "destructive" : healthScore > 40 ? "warning" : "success";
 
   return (
     <Card className="shadow-card hover:shadow-elevated transition-shadow">
@@ -34,20 +34,20 @@ const AssetHealthCard = ({ assetName, category, healthScore, failureProbability,
         <div>
           <div className="flex justify-between text-sm mb-2">
             <span className="text-muted-foreground">Health Score</span>
-            <span className="font-semibold">{healthScore}%</span>
+            <span className="font-semibold">{healthScore.toFixed(2)}%</span>
           </div>
           <Progress value={healthScore} className="h-2" />
         </div>
         <div>
           <div className="flex justify-between text-sm mb-2">
-            <span className="text-muted-foreground">Failure Probability</span>
-            <span className="font-semibold">{failureProbability}%</span>
+            <span className="text-muted-foreground">Prediction Confidence</span>
+            <span className="font-semibold">{confidence.toFixed(2)}%</span>
           </div>
-          <Progress value={failureProbability} className="h-2 [&>div]:bg-destructive" />
+          <Progress value={confidence} className="h-2 [&>div]:bg-destructive" />
         </div>
         <div className="pt-2 border-t">
-          <p className="text-sm text-muted-foreground">Next Maintenance</p>
-          <p className="font-medium">{nextMaintenance}</p>
+          <span className="text-sm text-muted-foreground">Remaining Useful Life : </span>
+          <span className="font-semibold">{nextMaintenance} days</span>
         </div>
       </CardContent>
     </Card>

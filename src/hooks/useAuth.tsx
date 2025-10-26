@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { useState, createContext, useContext, ReactNode } from 'react';
 import { authApi, tokenManager, type User, type LoginRequest } from '@/services/authApi';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
@@ -14,19 +14,12 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (context === undefined) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
-    return context;
-};
-
 interface AuthProviderProps {
     children: ReactNode;
 }
 
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+// Default export for Fast Refresh compatibility
+const AuthProvider = ({ children }: AuthProviderProps) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
@@ -34,40 +27,47 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const isAuthenticated = !!user && tokenManager.isAuthenticated();
 
     // Initialize auth state on mount
-    useEffect(() => {
-        const initAuth = async () => {
-            const token = tokenManager.getToken();
-            if (token) {
-                try {
-                    const userData = await authApi.getProfile();
-                    setUser(userData);
-                    // Update localStorage with current role for compatibility
-                    localStorage.setItem('userRole', userData.role);
-                } catch (error) {
-                    // Token is invalid, clear it
-                    tokenManager.removeToken();
-                    console.error('Failed to get user profile:', error);
-                }
-            }
-            setIsLoading(false);
-        };
+    // useEffect(() => {
+    //     const initAuth = async () => {
+    //         const token = tokenManager.getToken();
+    //         if (token) {
+    //             try {
+    //                 const userData = await authApi.getProfile();
+    //                 setUser(userData);
+    //                 // Update localStorage with current role for compatibility
+    //                 localStorage.setItem('userRole', userData.role);
+    //             } catch (error) {
+    //                 // Token is invalid, clear it
+    //                 tokenManager.removeToken();
+    //                 console.error('Failed to get user profile:', error);
+    //             }
+    //         }
+    //         setIsLoading(false);
+    //     };
 
-        initAuth();
-    }, []);
+    //     initAuth();
+    // }, []);
 
     const login = async (credentials: LoginRequest) => {
         try {
             setIsLoading(true);
             const response = await authApi.login(credentials);
 
-            // Store token and user data
-            tokenManager.setToken(response.token);
-            setUser(response.user);
-            localStorage.setItem('userRole', response.user.role);
+            // Store token and user data - using correct response structure
+            tokenManager.setToken(response.data.access_token);
+            tokenManager.setRefreshToken(response.data.refresh_token);
+            const userData: User = {
+                id: Math.random().toString(36), // Generate temporary ID
+                email: credentials.email,
+                role: response.data.role,
+                name: response.data.full_name
+            };
+            setUser(userData);
+            localStorage.setItem('userRole', response.data.role);
 
             toast({
                 title: 'Login Successful',
-                description: `Welcome back, ${response.user.name}!`,
+                description: `Welcome back, ${response.data.full_name}!`,
             });
 
             navigate('/dashboard');
@@ -101,7 +101,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const refreshToken = async () => {
         try {
             const response = await authApi.refreshToken();
-            tokenManager.setToken(response.token);
+            tokenManager.setToken(response.refresh_token);
         } catch (error) {
             console.error('Token refresh failed:', error);
             logout();
@@ -122,4 +122,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             {children}
         </AuthContext.Provider>
     );
+};
+
+// Default export for Fast Refresh compatibility
+export default AuthProvider;
+
+// Export the context and hook separately - this is a common pattern
+export { AuthContext };
+
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (context === undefined) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
 };

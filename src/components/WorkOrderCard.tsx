@@ -5,15 +5,16 @@ import { Calendar, User } from "lucide-react";
 
 interface WorkOrderCardProps {
   id: string;
+  assetId: string;
   assetName: string;
   type: string;
   priority: "low" | "medium" | "high" | "critical";
   assignedTo: string;
   scheduledDate: string;
-  status: "pending" | "in-progress" | "completed";
+  status: "PENDING" | "IN-PROGRESS" | "COMPLETED";
 }
 
-const WorkOrderCard = ({ id, assetName, type, priority, assignedTo, scheduledDate, status }: WorkOrderCardProps) => {
+const WorkOrderCard = ({ assetId, type, priority, assignedTo, scheduledDate, status }: WorkOrderCardProps) => {
   const priorityVariant = {
     low: "secondary",
     medium: "default",
@@ -22,9 +23,9 @@ const WorkOrderCard = ({ id, assetName, type, priority, assignedTo, scheduledDat
   };
 
   const statusVariant = {
-    pending: "secondary",
-    "in-progress": "default",
-    completed: "success",
+    "PENDING": "secondary",
+    "IN-PROGRESS": "default",
+    "COMPLETED": "success",
   };
 
   return (
@@ -32,7 +33,7 @@ const WorkOrderCard = ({ id, assetName, type, priority, assignedTo, scheduledDat
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="text-base">{assetName}</CardTitle>
+            <CardTitle className="text-base">{assetId}</CardTitle>
             <p className="text-sm text-muted-foreground mt-1">{type}</p>
           </div>
           <Badge variant={priorityVariant[priority] as "default" | "destructive"}>
@@ -51,9 +52,9 @@ const WorkOrderCard = ({ id, assetName, type, priority, assignedTo, scheduledDat
         </div>
         <div className="flex items-center justify-between pt-2 border-t">
           <Badge variant={statusVariant[status] as "default"}>
-            {status === "in-progress" ? "In Progress" : status.charAt(0).toUpperCase() + status.slice(1)}
+            {status === "IN-PROGRESS" ? "In Progress" : status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()}
           </Badge>
-          <Button size="sm" variant="outline">View Details</Button>
+          {/* <Button size="sm" variant="outline">Edit</Button> */}
         </div>
       </CardContent>
     </Card>

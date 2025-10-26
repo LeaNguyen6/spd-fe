@@ -14,16 +14,15 @@ import { z } from "zod";
 interface RegisterRequest {
     email: string;
     password: string;
-    name: string;
+    full_name: string;
     role: 'assets' | 'maintenance' | 'reliability';
 }
 
 const registerSchema = z.object({
-    name: z.string().min(2, "Name must be at least 2 characters").max(50, "Name is too long"),
+    full_name: z.string().max(50, "Full name is too long"),
     email: z.string().email("Please enter a valid email address"),
     password: z.string()
-        .min(6, "Password must be at least 6 characters")
-        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Password must contain at least one uppercase letter, one lowercase letter, and one number"),
+        .min(6, "Password must be at least 6 characters"),
     role: z.enum(["assets", "maintenance", "reliability"], {
         required_error: "Please select your role",
     }),
@@ -32,7 +31,7 @@ const registerSchema = z.object({
 const SignUp = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState<RegisterRequest>({
-        name: "",
+        full_name: "",
         email: "",
         password: "",
         role: "assets",
@@ -76,10 +75,10 @@ const SignUp = () => {
             const response = await authService.register(validated as RegisterRequest);
 
             // Store token and user data
-            tokenManager.setToken(response.token);
-            localStorage.setItem('userRole', response.user.role);
+            // tokenManager.setToken(response.token);
+            // localStorage.setItem('userRole', response.user.role);
 
-            navigate("/dashboard");
+            navigate("/signin");
         } catch (error) {
             if (error instanceof z.ZodError) {
                 const fieldErrors: Record<string, string> = {};
@@ -133,13 +132,13 @@ const SignUp = () => {
                                     id="name"
                                     type="text"
                                     placeholder="Enter your full name"
-                                    value={formData.name}
-                                    onChange={(e) => handleInputChange("name", e.target.value)}
+                                    value={formData.full_name}
+                                    onChange={(e) => handleInputChange("full_name", e.target.value)}
                                     className="pl-10"
                                     disabled={isLoading}
                                 />
                             </div>
-                            {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+                            {errors.full_name && <p className="text-sm text-destructive">{errors.full_name}</p>}
                         </div>
 
                         <div className="space-y-2">
@@ -255,14 +254,14 @@ const SignUp = () => {
                         </p>
                     </div>
 
-                    <div className="mt-4 text-center">
+                    {/* <div className="mt-4 text-center">
                         <Link
                             to="/role-selection"
                             className="text-sm text-muted-foreground hover:text-primary hover:underline"
                         >
                             Continue without authentication (Demo)
                         </Link>
-                    </div>
+                    </div> */}
 
                     <div className="mt-4 p-3 bg-muted rounded-lg">
                         <p className="text-xs text-muted-foreground text-center">

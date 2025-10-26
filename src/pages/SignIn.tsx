@@ -44,10 +44,11 @@ const SignIn = () => {
             const response = await authService.login(validated as LoginRequest);
 
             // Store token and user data
-            tokenManager.setToken(response.token);
-            localStorage.setItem('userRole', response.user.role);
+            tokenManager.setToken(response?.data?.access_token);
+            // localStorage.setItem('userRole', response.user.role);
 
-            navigate("/dashboard");
+            navigate("/role-selection");
+            // navigate("/dashboard");
         } catch (error) {
             if (error instanceof z.ZodError) {
                 const fieldErrors: Record<string, string> = {};
@@ -167,14 +168,14 @@ const SignIn = () => {
                         </p>
                     </div>
 
-                    <div className="mt-4 text-center">
+                    {/* <div className="mt-4 text-center">
                         <Link
                             to="/role-selection"
                             className="text-sm text-muted-foreground hover:text-primary hover:underline"
                         >
                             Continue without authentication (Demo)
                         </Link>
-                    </div>
+                    </div> */}
 
                     <div className="mt-4 p-3 bg-muted rounded-lg">
                         <p className="text-xs text-muted-foreground text-center">

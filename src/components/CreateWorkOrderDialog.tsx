@@ -1,43 +1,71 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
-import { apiService, logApiUsage } from "@/services/index";
+import { apiService, logApiUsage, type Asset } from "@/services/index";
 import { toast } from "@/hooks/use-toast";
 import { z } from "zod";
+import dayjs from "dayjs";
 
 const workOrderSchema = z.object({
   assetName: z.string().trim().min(1, "Asset name is required").max(100, "Asset name too long"),
   type: z.string().trim().min(1, "Work order type is required").max(100, "Type too long"),
-  priority: z.enum(["critical", "high", "medium", "low"], { required_error: "Priority is required" }),
+  priority: z.enum(["CRITICAL", "HIGH", "MEDIUM", "LOW"], { required_error: "Priority is required" }),
   assignedTo: z.string().trim().min(1, "Assigned to is required").max(100, "Name too long"),
   scheduledDate: z.string().min(1, "Scheduled date is required"),
 });
 
 interface CreateWorkOrderDialogProps {
   onWorkOrderCreated: () => void;
+  assets: Asset[];
 }
 
-const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProps) => {
+const CreateWorkOrderDialog = ({ onWorkOrderCreated, assets }: CreateWorkOrderDialogProps) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [workOrderTypes] = useState([
+    { value: "Emergency Repair", label: "Emergency Repair" },
+    { value: "Preventive Maintenance", label: "Preventive Maintenance" },
+    { value: "Inspection", label: "Inspection" }
+  ]);
   const [formData, setFormData] = useState<{
     assetName: string;
     type: string;
-    priority: "critical" | "high" | "medium" | "low";
+    priority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
     assignedTo: string;
     scheduledDate: string;
   }>({
     assetName: "",
     type: "",
-    priority: "medium",
+    priority: "MEDIUM",
     assignedTo: "",
     scheduledDate: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Reset form function
+  const resetForm = () => {
+    setFormData({
+      assetName: "",
+      type: "",
+      priority: "MEDIUM",
+      assignedTo: "",
+      scheduledDate: "",
+    });
+    setErrors({});
+  };
+
+  // Handle dialog open/close
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      resetForm();
+    }
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,26 +78,24 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProp
       setLoading(true);
       logApiUsage("Creating work order");
 
-      // Create work order via API service
+      // Format the scheduled date using dayjs
+      const formattedDate = dayjs(validated.scheduledDate).format();
+
+      // Create work order via API service using real API format
       await apiService.createWorkOrder({
-        assetName: validated.assetName,
+        asset_id: validated.assetName, // Using assetName as asset_id for now
         type: validated.type,
         priority: validated.priority,
-        assignedTo: validated.assignedTo,
-        scheduledDate: validated.scheduledDate,
-        status: "pending",
+        assigned_to: validated.assignedTo,
+        scheduled_date: formattedDate,
+        status: "PENDING",
       });
 
       // Reset form and close dialog
-      setFormData({
-        assetName: "",
-        type: "",
-        priority: "medium",
-        assignedTo: "",
-        scheduledDate: "",
-      });
-      setOpen(false);
+      resetForm();
       onWorkOrderCreated();
+
+      setOpen(false);
 
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -93,7 +119,7 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProp
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button>
           <Plus className="w-4 h-4 mr-2" />
@@ -119,13 +145,30 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProp
 
           <div className="space-y-2">
             <Label htmlFor="type">Work Order Type</Label>
-            <Input
+            <Select
+              value={formData.type}
+              onValueChange={(value: string) => setFormData({ ...formData, type: value })}
+
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select Work Order Type" />
+              </SelectTrigger>
+              <SelectContent>
+                {workOrderTypes.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* <Input
               id="type"
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value })}
               placeholder="e.g., Preventive Maintenance"
               maxLength={100}
-            />
+            /> */}
             {errors.type && <p className="text-sm text-destructive">{errors.type}</p>}
           </div>
 
@@ -133,7 +176,7 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProp
             <Label htmlFor="priority">Priority</Label>
             <Select
               value={formData.priority}
-              onValueChange={(value: "critical" | "high" | "medium" | "low") =>
+              onValueChange={(value: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW") =>
                 setFormData({ ...formData, priority: value })
               }
             >
@@ -141,10 +184,10 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProp
                 <SelectValue placeholder="Select priority" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="critical">Critical</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="CRITICAL">Critical</SelectItem>
+                <SelectItem value="HIGH">High</SelectItem>
+                <SelectItem value="MEDIUM">Medium</SelectItem>
+                <SelectItem value="LOW">Low</SelectItem>
               </SelectContent>
             </Select>
             {errors.priority && <p className="text-sm text-destructive">{errors.priority}</p>}
@@ -174,7 +217,7 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProp
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={loading}>
+            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} disabled={loading}>
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>

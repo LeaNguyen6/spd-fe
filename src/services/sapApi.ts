@@ -1,35 +1,52 @@
 import apiClient from '@/lib/apiClient';
 import { AxiosResponse } from 'axios';
 
-// Re-export types from mockSapApi for consistency
+// Asset and Work Order interfaces
 export interface Asset {
     assetId: string;
     assetName: string;
     category: string;
     healthScore: number;
-    failureProbability: number;
+    confidence: number;
     nextMaintenance: string;
     sapEquipmentNumber?: string;
 }
 
+export interface AssetPrediction {
+    engine_id: number;
+    remaining_useful_life: number;
+    is_going_to_fail: boolean;
+    confidence: number;
+}
+
+export interface AssetResponse {
+    time_cycles: number;
+    asset_name: string;
+    asset_id: number;
+    asset_category: string;
+    prediction: AssetPrediction;
+}
+
 export interface WorkOrder {
     id: string;
-    assetName: string;
+    // assetName: string;
+    assetId: string;
     type: string;
-    priority: "critical" | "high" | "medium" | "low";
+    priority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
     assignedTo: string;
     scheduledDate: string;
-    status: "pending" | "in-progress" | "completed";
+    status: "PENDING" | "IN-PROGRESS" | "COMPLETED";
     sapOrderNumber?: string;
 }
 
 export interface CreateWorkOrderRequest {
-    assetName: string;
+    asset_id: string;
     type: string;
-    priority: "critical" | "high" | "medium" | "low";
-    assignedTo: string;
-    scheduledDate: string;
-    status: "pending" | "in-progress" | "completed";
+    priority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+    assigned_to: string;
+    scheduled_date: string;
+    sap_order_number?: string;
+    status?: "PENDING" | "IN-PROGRESS" | "COMPLETED";
 }
 
 export interface SystemStats {
@@ -43,23 +60,41 @@ export interface SyncResult {
     assetsUpdated: number;
 }
 
+export interface ReliabilityStats {
+    f1_score: number;
+    mean_absolute_error: number;
+    mean_absolute_percentage_error: number;
+    mean_squared_error: number;
+    precision: number[];
+    recall: number[];
+    roc_auc: number[];
+    validation_time: string;
+}
+
 // Real API service using Axios
 export const sapApi = {
     // Get all assets from SAP PM
     async getAssets(): Promise<Asset[]> {
-        const response: AxiosResponse<Asset[]> = await apiClient.get('/sap/assets');
-        return response.data;
+        const response: AxiosResponse<AssetResponse[]> = await apiClient.get('/v1/list-asset');
+        return response.data.map(asset => ({
+            assetId: String(asset.asset_id),
+            assetName: asset.asset_name,
+            category: asset.asset_category,
+            healthScore: (asset.time_cycles / (asset.prediction.remaining_useful_life + asset.time_cycles) * 100),
+            confidence: (asset.prediction.confidence * 100),
+            nextMaintenance: asset.prediction.remaining_useful_life,
+        }));
     },
 
     // Get all work orders from SAP PM
     async getWorkOrders(): Promise<WorkOrder[]> {
-        const response: AxiosResponse<WorkOrder[]> = await apiClient.get('/sap/work-orders');
-        return response.data;
+        const response: AxiosResponse<{ orders: WorkOrder[], totals: number }> = await apiClient.get('/v1/work-orders');
+        return response.data.orders;
     },
 
     // Create a new work order in SAP PM
     async createWorkOrder(workOrder: CreateWorkOrderRequest): Promise<WorkOrder> {
-        const response: AxiosResponse<WorkOrder> = await apiClient.post('/sap/work-orders', workOrder);
+        const response: AxiosResponse<WorkOrder> = await apiClient.post('/v1/work-orders', workOrder);
         return response.data;
     },
 
@@ -125,4 +160,12 @@ export const sapApi = {
         const response: AxiosResponse<WorkOrder[]> = await apiClient.get(`/sap/work-orders/status/${status}`);
         return response.data;
     },
+
+
+    // Get reliability statistics
+    async getReliabilityStats(): Promise<ReliabilityStats> {
+        const response: AxiosResponse<ReliabilityStats> = await apiClient.get('/v1/reliability-stats');
+        return response.data;
+    }
+
 };

@@ -12,9 +12,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [assets, setAssets] = useState<Asset[]>([]);
-  const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [syncing, setSyncing] = useState(false);
+
 
   useEffect(() => {
     const role = localStorage.getItem("userRole") as UserRole | null;
@@ -22,73 +20,51 @@ const Dashboard = () => {
       navigate("/");
     } else {
       setUserRole(role);
-      loadData();
     }
   }, [navigate]);
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      logApiUsage("Loading dashboard data");
-      const [assetsData, workOrdersData] = await Promise.all([
-        apiService.getAssets(),
-        apiService.getWorkOrders(),
-      ]);
-      setAssets(assetsData);
-      setWorkOrders(workOrdersData);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to load data from SAP PM",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const loadData = async () => {
+  //   try {
+  //     setLoading(true);
+  //     logApiUsage("Loading dashboard data");
+  //     const [assetsData, workOrdersData] = await Promise.all([
+  //       apiService.getAssets(),
+  //       apiService.getWorkOrders(),
+  //     ]);
+  //     console.log('Assets:', assetsData);
+  //     setAssets(assetsData);
+  //     setWorkOrders(workOrdersData);
+  //   } catch (error) {
+  //     toast({
+  //       title: "Error",
+  //       description: "Failed to load data from SAP PM",
+  //       variant: "destructive",
+  //     });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  const handleSyncSap = async () => {
-    try {
-      setSyncing(true);
-      logApiUsage("Syncing SAP data");
-      await apiService.syncAssetData();
-      await loadData();
-    } catch (error) {
-      toast({
-        title: "Sync Failed",
-        description: "Failed to sync data with SAP PM",
-        variant: "destructive",
-      });
-    } finally {
-      setSyncing(false);
-    }
-  };
 
   const handleLogout = () => {
     localStorage.removeItem("userRole");
     navigate("/");
   };
 
-  if (!userRole || loading) {
+  if (!userRole) {
     return null;
   }
 
   return (
+
     <DashboardLayout userRole={userRole} onLogout={handleLogout}>
       {userRole === "assets" && (
         <AssetManagerDashboard
-          assets={assets}
-          syncing={syncing}
-          onSyncSap={handleSyncSap}
         />
       )}
 
       {userRole === "maintenance" && (
         <MaintenancePlannerDashboard
-          workOrders={workOrders}
-          syncing={syncing}
-          onSyncSap={handleSyncSap}
-          onWorkOrderCreated={loadData}
         />
       )}
 
@@ -96,6 +72,7 @@ const Dashboard = () => {
         <ReliabilityEngineerDashboard />
       )}
     </DashboardLayout>
+
   );
 };
 
