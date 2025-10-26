@@ -119,7 +119,7 @@ const MaintenancePlannerDashboard = () => {
                     <p className="text-muted-foreground">Schedule and optimize maintenance operations</p>
                 </div>
                 <div className="flex gap-3">
-                    <CreateWorkOrderDialog onWorkOrderCreated={loadWorkOrders} />
+                    <CreateWorkOrderDialog assets={assets} onWorkOrderCreated={loadWorkOrders} />
                 </div>
             </div>
 

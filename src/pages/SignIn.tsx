@@ -168,14 +168,14 @@ const SignIn = () => {
                         </p>
                     </div>
 
-                    <div className="mt-4 text-center">
+                    {/* <div className="mt-4 text-center">
                         <Link
                             to="/role-selection"
                             className="text-sm text-muted-foreground hover:text-primary hover:underline"
                         >
                             Continue without authentication (Demo)
                         </Link>
-                    </div>
+                    </div> */}
 
                     <div className="mt-4 p-3 bg-muted rounded-lg">
                         <p className="text-xs text-muted-foreground text-center">

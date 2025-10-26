@@ -92,7 +92,7 @@ const RoleSelection = () => {
                         Continue to Dashboard
                     </Button>
 
-                    <div className="text-center">
+                    {/* <div className="text-center">
                         <p className="text-sm text-muted-foreground">
                             Want to create an account?{" "}
                             <button
@@ -102,7 +102,7 @@ const RoleSelection = () => {
                                 Sign in here
                             </button>
                         </p>
-                    </div>
+                    </div> */}
                 </CardContent>
             </Card>
         </div>

@@ -20,12 +20,17 @@ const workOrderSchema = z.object({
 
 interface CreateWorkOrderDialogProps {
   onWorkOrderCreated: () => void;
+  assets: Asset[];
 }
 
-const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProps) => {
+const CreateWorkOrderDialog = ({ onWorkOrderCreated, assets }: CreateWorkOrderDialogProps) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [assets, setAssets] = useState<Asset[]>([]);
+  const [workOrderTypes] = useState([
+    { value: "Emergency Repair", label: "Emergency Repair" },
+    { value: "Preventive Maintenance", label: "Preventive Maintenance" },
+    { value: "Inspection", label: "Inspection" }
+  ]);
   const [formData, setFormData] = useState<{
     assetName: string;
     type: string;
@@ -41,25 +46,26 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProp
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Fetch assets when component mounts
-  useEffect(() => {
-    const loadAssets = async () => {
-      try {
-        logApiUsage("Loading assets for work order creation");
-        const assetsData = await apiService.getAssets();
-        setAssets(assetsData);
-      } catch (error) {
-        console.error("Failed to load assets:", error);
-        toast({
-          title: "Warning",
-          description: "Failed to load assets list",
-          variant: "destructive",
-        });
-      }
-    };
+  // Reset form function
+  const resetForm = () => {
+    setFormData({
+      assetName: "",
+      type: "",
+      priority: "MEDIUM",
+      assignedTo: "",
+      scheduledDate: "",
+    });
+    setErrors({});
+  };
 
-    loadAssets();
-  }, []);
+  // Handle dialog open/close
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      resetForm();
+    }
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,13 +92,7 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProp
       });
 
       // Reset form and close dialog
-      setFormData({
-        assetName: "",
-        type: "",
-        priority: "MEDIUM",
-        assignedTo: "",
-        scheduledDate: "",
-      });
+      resetForm();
       onWorkOrderCreated();
 
       setOpen(false);
@@ -119,7 +119,7 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProp
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button>
           <Plus className="w-4 h-4 mr-2" />
@@ -154,10 +154,11 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProp
                 <SelectValue placeholder="Select Work Order Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="FD001">Preventive Maintenance</SelectItem>
-                {/* <SelectItem value="high">High</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="low">Low</SelectItem> */}
+                {workOrderTypes.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
@@ -216,7 +217,7 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProp
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={loading}>
+            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} disabled={loading}>
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>
