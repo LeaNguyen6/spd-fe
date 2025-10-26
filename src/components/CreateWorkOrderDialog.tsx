@@ -79,10 +79,10 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProp
       await apiService.createWorkOrder({
         asset_id: validated.assetName, // Using assetName as asset_id for now
         type: validated.type,
-        priority: validated.priority.toLowerCase() as "critical" | "high" | "medium" | "low",
+        priority: validated.priority,
         assigned_to: validated.assignedTo,
         scheduled_date: formattedDate,
-        status: "pending",
+        status: "PENDING",
       });
 
       // Reset form and close dialog

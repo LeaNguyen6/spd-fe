@@ -11,7 +11,7 @@ interface WorkOrderCardProps {
   priority: "low" | "medium" | "high" | "critical";
   assignedTo: string;
   scheduledDate: string;
-  status: "pending" | "in-progress" | "completed";
+  status: "PENDING" | "IN-PROGRESS" | "COMPLETED";
 }
 
 const WorkOrderCard = ({ assetId, type, priority, assignedTo, scheduledDate, status }: WorkOrderCardProps) => {
@@ -23,9 +23,9 @@ const WorkOrderCard = ({ assetId, type, priority, assignedTo, scheduledDate, sta
   };
 
   const statusVariant = {
-    pending: "secondary",
-    "in-progress": "default",
-    completed: "success",
+    "PENDING": "secondary",
+    "IN-PROGRESS": "default",
+    "COMPLETED": "success",
   };
 
   return (
@@ -52,7 +52,7 @@ const WorkOrderCard = ({ assetId, type, priority, assignedTo, scheduledDate, sta
         </div>
         <div className="flex items-center justify-between pt-2 border-t">
           <Badge variant={statusVariant[status] as "default"}>
-            {status === "in-progress" ? "In Progress" : status.charAt(0).toUpperCase() + status.slice(1)}
+            {status === "IN-PROGRESS" ? "In Progress" : status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()}
           </Badge>
           {/* <Button size="sm" variant="outline">Edit</Button> */}
         </div>

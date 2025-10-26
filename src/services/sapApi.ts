@@ -17,21 +17,21 @@ export interface WorkOrder {
     // assetName: string;
     assetId: string;
     type: string;
-    priority: "critical" | "high" | "medium" | "low";
+    priority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
     assignedTo: string;
     scheduledDate: string;
-    status: "pending" | "in-progress" | "completed";
+    status: "PENDING" | "IN-PROGRESS" | "COMPLETED";
     sapOrderNumber?: string;
 }
 
 export interface CreateWorkOrderRequest {
     asset_id: string;
     type: string;
-    priority: "critical" | "high" | "medium" | "low";
+    priority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
     assigned_to: string;
     scheduled_date: string;
     sap_order_number?: string;
-    status?: "pending" | "in-progress" | "completed";
+    status?: "PENDING" | "IN-PROGRESS" | "COMPLETED";
 }
 
 export interface SystemStats {

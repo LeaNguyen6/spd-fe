@@ -6,7 +6,6 @@ import { Activity, TrendingUp, Wrench, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { apiService, type Asset, type WorkOrder, logApiUsage } from "@/services/index";
 import { toast } from "@/hooks/use-toast";
-import { UserRole } from "@/types/roles";
 
 // Normalized WorkOrder type for the component
 interface NormalizedWorkOrder {
@@ -17,19 +16,12 @@ interface NormalizedWorkOrder {
     priority: "critical" | "high" | "medium" | "low";
     assignedTo: string;
     scheduledDate: string;
-    status: "pending" | "in-progress" | "completed";
+    status: "PENDING" | "IN-PROGRESS" | "COMPLETED";
     sapOrderNumber?: string;
 }
 
-interface MaintenancePlannerDashboardProps {
 
-    onWorkOrderCreated: () => Promise<void>;
-}
-
-const MaintenancePlannerDashboard = ({
-
-    onWorkOrderCreated
-}: MaintenancePlannerDashboardProps) => {
+const MaintenancePlannerDashboard = () => {
     const [assets, setAssets] = useState<Asset[]>([]);
     const [workOrders, setWorkOrders] = useState<NormalizedWorkOrder[]>([]);
     const [loading, setLoading] = useState(true);
@@ -72,7 +64,7 @@ const MaintenancePlannerDashboard = ({
                 priority: order.priority.toLowerCase() as "critical" | "high" | "medium" | "low",
                 assignedTo: order.assignedTo,
                 scheduledDate: order.scheduledDate,
-                status: order.status,
+                status: order.status, // Keep uppercase from API
                 sapOrderNumber: order.sapOrderNumber
             }));
 
