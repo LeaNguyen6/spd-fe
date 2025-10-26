@@ -2,7 +2,7 @@ import { useState } from "react";
 import MetricCard from "@/components/MetricCard";
 import AssetHealthCard from "@/components/AssetHealthCard";
 import { Activity, AlertTriangle, TrendingUp, Wrench, RefreshCw } from "lucide-react";
-import { type Asset } from "@/services/mockSapApi";
+import { type Asset } from "@/services/index";
 import { Button } from "@/components/ui/button";
 
 interface AssetManagerDashboardProps {

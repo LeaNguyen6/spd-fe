@@ -39,7 +39,7 @@ const ReliabilityEngineerDashboard = () => {
             </div>
             {loading ? (
                 <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-                    <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                    <Loader2 className="w-8 h-8 animate-spin" />
                     <p className="text-muted-foreground">Loading reliability statistics...</p>
                 </div>
             ) : (

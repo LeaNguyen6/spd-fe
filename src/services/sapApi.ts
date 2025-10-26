@@ -1,7 +1,7 @@
 import apiClient from '@/lib/apiClient';
 import { AxiosResponse } from 'axios';
 
-// Re-export types from mockSapApi for consistency
+// Asset and Work Order interfaces
 export interface Asset {
     assetId: string;
     assetName: string;
@@ -66,8 +66,8 @@ export const sapApi = {
 
     // Get all work orders from SAP PM
     async getWorkOrders(): Promise<WorkOrder[]> {
-        const response: AxiosResponse<WorkOrder[]> = await apiClient.get('/v1/work-orders');
-        return response.data;
+        const response: AxiosResponse<{ orders: WorkOrder[], totals: number }> = await apiClient.get('/v1/work-orders');
+        return response.data.orders;
     },
 
     // Create a new work order in SAP PM

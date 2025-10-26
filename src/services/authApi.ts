@@ -10,19 +10,20 @@ export interface LoginRequest {
 export interface RegisterRequest {
     email: string;
     password: string;
-    name: string;
+    full_name: string;
     role: 'assets' | 'maintenance' | 'reliability';
 }
 
 export interface LoginResponse {
-    token: string;
-    user: {
-        id: string;
-        email: string;
+    data: {
+        access_token: string;
+        refresh_token: string;
         role: 'assets' | 'maintenance' | 'reliability';
-        name: string;
+        full_name: string;
     };
 }
+
+
 
 export interface User {
     id: string;
@@ -35,7 +36,7 @@ export interface User {
 export const authApi = {
     // Login user
     login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-        const response: AxiosResponse<LoginResponse> = await apiClient.post('/auth/login', credentials);
+        const response: AxiosResponse<LoginResponse> = await apiClient.post('v1/auth/login', credentials);
         return response.data;
     },
 
@@ -48,7 +49,7 @@ export const authApi = {
 
     // Get current user profile
     getProfile: async (): Promise<User> => {
-        const response: AxiosResponse<User> = await apiClient.get('/auth/profile');
+        const response: AxiosResponse<User> = await apiClient.get('v1/auth/profile');
         return response.data;
     },
 
@@ -60,7 +61,7 @@ export const authApi = {
 
     // Register user (if needed)
     register: async (userData: RegisterRequest): Promise<LoginResponse> => {
-        const response: AxiosResponse<LoginResponse> = await apiClient.post('/auth/register', userData);
+        const response: AxiosResponse<LoginResponse> = await apiClient.post('v1/auth/register', userData);
         return response.data;
     },
 };

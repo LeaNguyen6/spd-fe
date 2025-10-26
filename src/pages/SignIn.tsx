@@ -44,10 +44,11 @@ const SignIn = () => {
             const response = await authService.login(validated as LoginRequest);
 
             // Store token and user data
-            tokenManager.setToken(response.token);
-            localStorage.setItem('userRole', response.user.role);
+            tokenManager.setToken(response?.data?.access_token);
+            // localStorage.setItem('userRole', response.user.role);
 
-            navigate("/dashboard");
+            navigate("/role-selection");
+            // navigate("/dashboard");
         } catch (error) {
             if (error instanceof z.ZodError) {
                 const fieldErrors: Record<string, string> = {};

@@ -12,9 +12,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [assets, setAssets] = useState<Asset[]>([]);
-  const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
-  // const [loading, setLoading] = useState(true);
-  const [syncing, setSyncing] = useState(false);
+
 
   useEffect(() => {
     const role = localStorage.getItem("userRole") as UserRole | null;
@@ -25,27 +23,27 @@ const Dashboard = () => {
     }
   }, [navigate]);
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      logApiUsage("Loading dashboard data");
-      const [assetsData, workOrdersData] = await Promise.all([
-        apiService.getAssets(),
-        apiService.getWorkOrders(),
-      ]);
-      console.log('Assets:', assetsData);
-      setAssets(assetsData);
-      setWorkOrders(workOrdersData);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to load data from SAP PM",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const loadData = async () => {
+  //   try {
+  //     setLoading(true);
+  //     logApiUsage("Loading dashboard data");
+  //     const [assetsData, workOrdersData] = await Promise.all([
+  //       apiService.getAssets(),
+  //       apiService.getWorkOrders(),
+  //     ]);
+  //     console.log('Assets:', assetsData);
+  //     setAssets(assetsData);
+  //     setWorkOrders(workOrdersData);
+  //   } catch (error) {
+  //     toast({
+  //       title: "Error",
+  //       description: "Failed to load data from SAP PM",
+  //       variant: "destructive",
+  //     });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
 
   const handleLogout = () => {
@@ -63,14 +61,11 @@ const Dashboard = () => {
       {userRole === "assets" && (
         <AssetManagerDashboard
           assets={assets}
-          syncing={syncing}
         />
       )}
 
       {userRole === "maintenance" && (
         <MaintenancePlannerDashboard
-
-          onWorkOrderCreated={loadData}
         />
       )}
 

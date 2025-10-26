@@ -4,15 +4,14 @@ import WorkOrderCard from "@/components/WorkOrderCard";
 import CreateWorkOrderDialog from "@/components/CreateWorkOrderDialog";
 import { Activity, TrendingUp, Wrench, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { apiService, type Asset, logApiUsage, isUsingMockApi } from "@/services/index";
-import type { WorkOrder as MockWorkOrder } from "@/services/mockSapApi";
-import type { WorkOrder as RealWorkOrder } from "@/services/sapApi";
+import { apiService, type Asset, type WorkOrder, logApiUsage } from "@/services/index";
 import { toast } from "@/hooks/use-toast";
 import { UserRole } from "@/types/roles";
 
 // Normalized WorkOrder type for the component
 interface NormalizedWorkOrder {
     id: string;
+    assetId: string;
     assetName: string;
     type: string;
     priority: "critical" | "high" | "medium" | "low";
@@ -65,7 +64,19 @@ const MaintenancePlannerDashboard = ({
             console.log('Work Orders:', workOrdersData);
 
             // Transform the data to normalized format
-            setWorkOrders(workOrdersData.orders);
+            const normalizedOrders: NormalizedWorkOrder[] = workOrdersData.map((order: WorkOrder) => ({
+                id: order.id,
+                assetName: `Asset ${order.assetId}`, // Since real API doesn't have assetName, create it
+                assetId: order.assetId,
+                type: order.type,
+                priority: order.priority.toLowerCase() as "critical" | "high" | "medium" | "low",
+                assignedTo: order.assignedTo,
+                scheduledDate: order.scheduledDate,
+                status: order.status,
+                sapOrderNumber: order.sapOrderNumber
+            }));
+
+            setWorkOrders(normalizedOrders);
         } catch (error) {
             toast({
                 title: "Error",

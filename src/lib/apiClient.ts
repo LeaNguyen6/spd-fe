@@ -33,11 +33,11 @@ apiClient.interceptors.response.use(
     },
     (error) => {
         // Handle 401 unauthorized - clear token and redirect to login
-        if (error.response?.status === 401) {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('userRole');
-            window.location.href = '/';
-        }
+        // if (error.response?.status === 401) {
+        //     localStorage.removeItem('authToken');
+        //     localStorage.removeItem('userRole');
+        //     window.location.href = '/';
+        // }
 
         // Handle 403 forbidden
         if (error.response?.status === 403) {

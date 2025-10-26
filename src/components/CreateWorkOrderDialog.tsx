@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
-import { apiService, logApiUsage, isUsingMockApi, type Asset } from "@/services/index";
+import { apiService, logApiUsage, type Asset } from "@/services/index";
 import { toast } from "@/hooks/use-toast";
 import { z } from "zod";
 import dayjs from "dayjs";
@@ -75,22 +75,14 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated }: CreateWorkOrderDialogProp
       // Format the scheduled date using dayjs
       const formattedDate = dayjs(validated.scheduledDate).format();
 
-      // Convert priority to lowercase for API compatibility
-
-      // Create work order via API service
-      // Provide both mock and real API formats to satisfy the union type
+      // Create work order via API service using real API format
       await apiService.createWorkOrder({
-        // Mock API format (camelCase)
-        assetName: validated.assetName,
+        asset_id: validated.assetName, // Using assetName as asset_id for now
         type: validated.type,
-        priority: validated.priority,
-        assignedTo: validated.assignedTo,
-        scheduledDate: formattedDate,
-        status: "pending",
-        // Real API format (snake_case)
-        asset_id: validated.assetName,
+        priority: validated.priority.toLowerCase() as "critical" | "high" | "medium" | "low",
         assigned_to: validated.assignedTo,
         scheduled_date: formattedDate,
+        status: "pending",
       });
 
       // Reset form and close dialog
