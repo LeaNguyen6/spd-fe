@@ -44,18 +44,19 @@ export const authApi = {
     logout: async (): Promise<void> => {
         await apiClient.post('/auth/logout');
         localStorage.removeItem('authToken');
+        localStorage.removeItem('refreshToken');
         localStorage.removeItem('userRole');
     },
 
     // Get current user profile
-    getProfile: async (): Promise<User> => {
-        const response: AxiosResponse<User> = await apiClient.get('v1/auth/profile');
-        return response.data;
-    },
+    // getProfile: async (): Promise<User> => {
+    //     const response: AxiosResponse<User> = await apiClient.get('v1/auth/profile');
+    //     return response.data;
+    // },
 
     // Refresh token
-    refreshToken: async (): Promise<{ token: string }> => {
-        const response: AxiosResponse<{ token: string }> = await apiClient.post('/auth/refresh');
+    refreshToken: async (): Promise<{ refresh_token: string }> => {
+        const response: AxiosResponse<{ refresh_token: string }> = await apiClient.post('v1/auth/refresh');
         return response.data;
     },
 
@@ -72,12 +73,21 @@ export const tokenManager = {
         localStorage.setItem('authToken', token);
     },
 
+    setRefreshToken: (refreshToken: string): void => {
+        localStorage.setItem('refreshToken', refreshToken);
+    },
+
     getToken: (): string | null => {
         return localStorage.getItem('authToken');
     },
 
+    getRefreshToken: (): string | null => {
+        return localStorage.getItem('refreshToken');
+    },
+
     removeToken: (): void => {
         localStorage.removeItem('authToken');
+        localStorage.removeItem('refreshToken');
         localStorage.removeItem('userRole');
     },
 

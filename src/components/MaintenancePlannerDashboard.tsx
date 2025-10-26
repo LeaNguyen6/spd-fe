@@ -25,6 +25,38 @@ const MaintenancePlannerDashboard = () => {
     const [assets, setAssets] = useState<Asset[]>([]);
     const [workOrders, setWorkOrders] = useState<NormalizedWorkOrder[]>([]);
     const [loading, setLoading] = useState(true);
+
+    // Calculate metrics from workOrders
+    const getScheduledThisWeek = () => {
+        const today = new Date();
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay());
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+        return workOrders.filter(order => {
+            const scheduledDate = new Date(order.scheduledDate);
+            return scheduledDate >= startOfWeek && scheduledDate <= endOfWeek;
+        });
+    };
+
+    const getHighPriorityThisWeek = () => {
+        const scheduledThisWeek = getScheduledThisWeek();
+        return scheduledThisWeek.filter(order =>
+            order.priority === 'critical' || order.priority === 'high'
+        ).length;
+    };
+
+    const getCompletionRate = () => {
+        if (workOrders.length === 0) return 0;
+        const completedOrders = workOrders.filter(order => order.status === 'COMPLETED').length;
+        return Math.round((completedOrders / workOrders.length) * 100);
+    };
+
+    const scheduledThisWeek = getScheduledThisWeek();
+    const highPriorityThisWeek = getHighPriorityThisWeek();
+    const completionRate = getCompletionRate();
+
     useEffect(() => {
         loadAssets();
         loadWorkOrders();
@@ -92,9 +124,21 @@ const MaintenancePlannerDashboard = () => {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <MetricCard title="Open Work Orders" value="156" icon={<Wrench className="w-4 h-4" />} />
-                <MetricCard title="Scheduled This Week" value="34" subtitle="12 high priority" variant="warning" icon={<Activity className="w-4 h-4" />} />
-                <MetricCard title="Completion Rate" value="94%" subtitle="+3% vs last month" trend="up" variant="success" icon={<TrendingUp className="w-4 h-4" />} />
+                <MetricCard title="Open Work Orders" value={workOrders.length} icon={<Wrench className="w-4 h-4" />} />
+                <MetricCard
+                    title="Scheduled This Week"
+                    value={scheduledThisWeek.length}
+                    subtitle={`${highPriorityThisWeek} high priority`}
+                    variant={highPriorityThisWeek > 0 ? "warning" : "default"}
+                    icon={<Activity className="w-4 h-4" />}
+                />
+                <MetricCard
+                    title="Completion Rate"
+                    value={`${completionRate}%`}
+                    subtitle={completionRate >= 90 ? "Excellent performance" : completionRate >= 70 ? "Good performance" : "Needs improvement"}
+                    variant={completionRate >= 90 ? "success" : completionRate >= 70 ? "default" : "warning"}
+                    icon={<TrendingUp className="w-4 h-4" />}
+                />
                 <MetricCard title="Resource Utilization" value="87%" icon={<Activity className="w-4 h-4" />} />
             </div>
 

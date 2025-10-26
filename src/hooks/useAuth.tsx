@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { useState, createContext, useContext, ReactNode } from 'react';
 import { authApi, tokenManager, type User, type LoginRequest } from '@/services/authApi';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
@@ -27,26 +27,26 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     const isAuthenticated = !!user && tokenManager.isAuthenticated();
 
     // Initialize auth state on mount
-    useEffect(() => {
-        const initAuth = async () => {
-            const token = tokenManager.getToken();
-            if (token) {
-                try {
-                    const userData = await authApi.getProfile();
-                    setUser(userData);
-                    // Update localStorage with current role for compatibility
-                    localStorage.setItem('userRole', userData.role);
-                } catch (error) {
-                    // Token is invalid, clear it
-                    tokenManager.removeToken();
-                    console.error('Failed to get user profile:', error);
-                }
-            }
-            setIsLoading(false);
-        };
+    // useEffect(() => {
+    //     const initAuth = async () => {
+    //         const token = tokenManager.getToken();
+    //         if (token) {
+    //             try {
+    //                 const userData = await authApi.getProfile();
+    //                 setUser(userData);
+    //                 // Update localStorage with current role for compatibility
+    //                 localStorage.setItem('userRole', userData.role);
+    //             } catch (error) {
+    //                 // Token is invalid, clear it
+    //                 tokenManager.removeToken();
+    //                 console.error('Failed to get user profile:', error);
+    //             }
+    //         }
+    //         setIsLoading(false);
+    //     };
 
-        initAuth();
-    }, []);
+    //     initAuth();
+    // }, []);
 
     const login = async (credentials: LoginRequest) => {
         try {
@@ -55,6 +55,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
             // Store token and user data - using correct response structure
             tokenManager.setToken(response.data.access_token);
+            tokenManager.setRefreshToken(response.data.refresh_token);
             const userData: User = {
                 id: Math.random().toString(36), // Generate temporary ID
                 email: credentials.email,
@@ -100,7 +101,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     const refreshToken = async () => {
         try {
             const response = await authApi.refreshToken();
-            tokenManager.setToken(response.token);
+            tokenManager.setToken(response.refresh_token);
         } catch (error) {
             console.error('Token refresh failed:', error);
             logout();
