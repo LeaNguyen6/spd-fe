@@ -12,6 +12,21 @@ export interface Asset {
     sapEquipmentNumber?: string;
 }
 
+export interface AssetPrediction {
+    engine_id: number;
+    remaining_useful_life: number;
+    is_going_to_fail: boolean;
+    confidence: number;
+}
+
+export interface AssetResponse {
+    time_cycles: number;
+    asset_name: string;
+    asset_id: number;
+    asset_category: string;
+    prediction: AssetPrediction;
+}
+
 export interface WorkOrder {
     id: string;
     // assetName: string;
@@ -60,8 +75,15 @@ export interface ReliabilityStats {
 export const sapApi = {
     // Get all assets from SAP PM
     async getAssets(): Promise<Asset[]> {
-        const response: AxiosResponse<Asset[]> = await apiClient.get('/v1/list-asset');
-        return response.data;
+        const response: AxiosResponse<AssetResponse[]> = await apiClient.get('/v1/list-asset');
+        return response.data.map(asset => ({
+            assetId: String(asset.asset_id),
+            assetName: asset.asset_name,
+            category: asset.asset_category,
+            healthScore: (asset.time_cycles / (asset.prediction.remaining_useful_life + asset.time_cycles) * 100),
+            confidence: (asset.prediction.confidence * 100),
+            nextMaintenance: asset.prediction.remaining_useful_life,
+        }));
     },
 
     // Get all work orders from SAP PM

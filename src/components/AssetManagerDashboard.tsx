@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import MetricCard from "@/components/MetricCard";
 import AssetHealthCard from "@/components/AssetHealthCard";
 import { Activity, AlertTriangle, TrendingUp, Wrench, RefreshCw } from "lucide-react";
-import { apiService, type Asset } from "@/services/index";
+import { apiService, type Asset, type WorkOrder } from "@/services/index";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 
@@ -11,17 +11,27 @@ import { toast } from "@/hooks/use-toast";
 const AssetManagerDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [assets, setAssets] = useState<Asset[]>([]);
+    const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
     const [displayCount, setDisplayCount] = useState(10);
     const [showLoadMore, setShowLoadMore] = useState(false);
 
+    // Calculate pending replacements from work orders
+    const getPendingReplacements = () => {
+        return workOrders.filter(order =>
+            order.status === 'PENDING' || order.status === 'IN-PROGRESS'
+        ).length;
+    };
+
+    const pendingReplacements = getPendingReplacements();
+
     useEffect(() => {
         loadAssets();
+        loadWorkOrders();
     }, []);
     const loadAssets = async () => {
         try {
             setLoading(true);
             const assetsData = await apiService.getAssets();
-            console.log('Assets:', assetsData);
             setAssets(assetsData);
             setShowLoadMore(assetsData.length > 10);
         } catch (error) {
@@ -32,6 +42,19 @@ const AssetManagerDashboard = () => {
             });
         } finally {
             setLoading(false);
+        }
+    };
+
+    const loadWorkOrders = async () => {
+        try {
+            const workOrdersData = await apiService.getWorkOrders();
+            setWorkOrders(workOrdersData);
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "Failed to load work orders from SAP PM",
+                variant: "destructive",
+            });
         }
     };
 
@@ -49,17 +72,17 @@ const AssetManagerDashboard = () => {
                     <h2 className="text-3xl font-bold mb-2">Asset Manager Dashboard</h2>
                     <p className="text-muted-foreground">Monitor asset health and manage replacement planning</p>
                 </div>
-                <Button disabled={loading} variant="outline">
+                <Button disabled={loading} variant="outline" onClick={loadAssets}>
                     <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
                     Refresh
                 </Button>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <MetricCard title="Total Assets" value="847" icon={<Activity className="w-4 h-4" />} />
-                <MetricCard title="High-Risk Assets" value="23" subtitle="+3 from last week" trend="up" variant="warning" icon={<AlertTriangle className="w-4 h-4" />} />
-                <MetricCard title="Avg Health Score" value="78%" subtitle="+2% improvement" trend="up" variant="success" icon={<TrendingUp className="w-4 h-4" />} />
-                <MetricCard title="Pending Replacements" value="12" icon={<Wrench className="w-4 h-4" />} />
+                <MetricCard title="Total Assets" value={assets.length} icon={<Activity className="w-4 h-4" />} />
+                <MetricCard title="High-Risk Assets" value={assets.filter(asset => asset.healthScore > 60).length} trend="up" variant="warning" icon={<AlertTriangle className="w-4 h-4" />} />
+                <MetricCard title="Avg Health Score" value={`${(assets.reduce((acc, asset) => acc + asset.healthScore, 0) / assets.length).toFixed(2)}%`} trend="up" variant="success" icon={<TrendingUp className="w-4 h-4" />} />
+                <MetricCard title="Pending Replacements" value={pendingReplacements} icon={<Wrench className="w-4 h-4" />} />
             </div>
 
             <div>

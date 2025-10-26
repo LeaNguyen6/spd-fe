@@ -12,9 +12,9 @@ interface AssetHealthCardProps {
 }
 
 const AssetHealthCard = ({ assetName, category, healthScore, confidence, nextMaintenance }: AssetHealthCardProps) => {
-  const isHighRisk = confidence > 60;
-  const riskLevel = confidence > 70 ? "Critical" : confidence > 40 ? "High" : "Low";
-  const riskVariant = confidence > 70 ? "destructive" : confidence > 40 ? "warning" : "success";
+  const isHighRisk = healthScore > 60;
+  const riskLevel = healthScore > 70 ? "Critical" : healthScore > 40 ? "High" : "Low";
+  const riskVariant = healthScore > 70 ? "destructive" : healthScore > 40 ? "warning" : "success";
 
   return (
     <Card className="shadow-card hover:shadow-elevated transition-shadow">
@@ -34,20 +34,20 @@ const AssetHealthCard = ({ assetName, category, healthScore, confidence, nextMai
         <div>
           <div className="flex justify-between text-sm mb-2">
             <span className="text-muted-foreground">Health Score</span>
-            <span className="font-semibold">{healthScore}%</span>
+            <span className="font-semibold">{healthScore.toFixed(2)}%</span>
           </div>
           <Progress value={healthScore} className="h-2" />
         </div>
         <div>
           <div className="flex justify-between text-sm mb-2">
-            <span className="text-muted-foreground">Failure Probability</span>
-            <span className="font-semibold">{confidence}%</span>
+            <span className="text-muted-foreground">Prediction Confidence</span>
+            <span className="font-semibold">{confidence.toFixed(2)}%</span>
           </div>
           <Progress value={confidence} className="h-2 [&>div]:bg-destructive" />
         </div>
         <div className="pt-2 border-t">
-          <p className="text-sm text-muted-foreground">Next Maintenance</p>
-          <p className="font-medium">{nextMaintenance}</p>
+          <span className="text-sm text-muted-foreground">Remaining Useful Life : </span>
+          <span className="font-semibold">{nextMaintenance} days</span>
         </div>
       </CardContent>
     </Card>

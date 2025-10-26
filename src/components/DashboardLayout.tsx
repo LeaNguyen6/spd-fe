@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 import { LayoutDashboard, Wrench, TrendingUp, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +12,8 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout = ({ children, userRole, onLogout }: DashboardLayoutProps) => {
+  const navigate = useNavigate();
+
   const roleLabels = {
     assets: { label: "Asset Manager", icon: LayoutDashboard },
     maintenance: { label: "Maintenance Planner", icon: Wrench },
@@ -32,9 +35,13 @@ const DashboardLayout = ({ children, userRole, onLogout }: DashboardLayoutProps)
                   alt="SPD Logo"
                   className="w-8 h-8 object-contain"
                 />
-                <h1 className="text-xl font-bold text-primary-foreground">AssetAI Platform</h1>
+                <h1 className="text-xl font-bold text-primary-foreground">SPD Asset Platform</h1>
               </div>
-              <Badge variant="secondary" className="hidden md:flex items-center gap-2 px-3 py-1">
+              <Badge
+                variant="secondary"
+                className="hidden md:flex items-center gap-2 px-3 py-1 cursor-pointer hover:bg-secondary/80 transition-colors"
+                onClick={() => navigate('/role-selection')}
+              >
                 <RoleIcon className="w-4 h-4" />
                 {currentRole.label}
               </Badge>
