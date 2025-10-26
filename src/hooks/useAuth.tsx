@@ -14,19 +14,12 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (context === undefined) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
-    return context;
-};
-
 interface AuthProviderProps {
     children: ReactNode;
 }
 
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+// Default export for Fast Refresh compatibility
+const AuthProvider = ({ children }: AuthProviderProps) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
@@ -60,14 +53,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             setIsLoading(true);
             const response = await authApi.login(credentials);
 
-            // Store token and user data
-            tokenManager.setToken(response.token);
-            setUser(response.user);
-            localStorage.setItem('userRole', response.user.role);
+            // Store token and user data - using correct response structure
+            tokenManager.setToken(response.data.access_token);
+            const userData: User = {
+                id: Math.random().toString(36), // Generate temporary ID
+                email: credentials.email,
+                role: response.data.role,
+                name: response.data.full_name
+            };
+            setUser(userData);
+            localStorage.setItem('userRole', response.data.role);
 
             toast({
                 title: 'Login Successful',
-                description: `Welcome back, ${response.user.name}!`,
+                description: `Welcome back, ${response.data.full_name}!`,
             });
 
             navigate('/dashboard');
@@ -122,4 +121,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             {children}
         </AuthContext.Provider>
     );
+};
+
+// Default export for Fast Refresh compatibility
+export default AuthProvider;
+
+// Export the context and hook separately - this is a common pattern
+export { AuthContext };
+
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (context === undefined) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
 };

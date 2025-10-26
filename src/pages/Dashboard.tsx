@@ -60,7 +60,6 @@ const Dashboard = () => {
     <DashboardLayout userRole={userRole} onLogout={handleLogout}>
       {userRole === "assets" && (
         <AssetManagerDashboard
-          assets={assets}
         />
       )}
 
