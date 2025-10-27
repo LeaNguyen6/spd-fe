@@ -51,7 +51,7 @@ const RoleSelection = () => {
             <Card className="w-full max-w-4xl shadow-elegant">
                 <CardHeader className="text-center space-y-2 pb-6">
                     <CardTitle className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                        AssetAI Platform
+                        SP Digital AssetAI Platform
                     </CardTitle>
                     <CardDescription className="text-lg">
                         Select your role to access the dashboard (Demo Mode)

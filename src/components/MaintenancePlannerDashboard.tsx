@@ -4,7 +4,7 @@ import WorkOrderCard from "@/components/WorkOrderCard";
 import CreateWorkOrderDialog from "@/components/CreateWorkOrderDialog";
 import { Activity, TrendingUp, Wrench, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { apiService, type Asset, type WorkOrder, logApiUsage } from "@/services/index";
+import { apiService, type Asset, type WorkOrder } from "@/services/index";
 import { toast } from "@/hooks/use-toast";
 
 // Normalized WorkOrder type for the component
@@ -65,9 +65,8 @@ const MaintenancePlannerDashboard = () => {
     const loadAssets = async () => {
         try {
             setLoading(true);
-            logApiUsage("Loading assets data");
+
             const assetsData = await apiService.getAssets();
-            console.log('Assets:', assetsData);
             setAssets(assetsData);
         } catch (error) {
             toast({
@@ -83,10 +82,8 @@ const MaintenancePlannerDashboard = () => {
     const loadWorkOrders = async () => {
         try {
             setLoading(true);
-            logApiUsage("Loading work orders data");
-            const workOrdersData = await apiService.getWorkOrders();
-            console.log('Work Orders:', workOrdersData);
 
+            const workOrdersData = await apiService.getWorkOrders();
             // Transform the data to normalized format
             const normalizedOrders: NormalizedWorkOrder[] = workOrdersData.map((order: WorkOrder) => ({
                 id: order.id,

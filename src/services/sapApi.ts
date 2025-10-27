@@ -8,7 +8,7 @@ export interface Asset {
     category: string;
     healthScore: number;
     confidence: number;
-    nextMaintenance: string;
+    nextMaintenance: number;
     sapEquipmentNumber?: string;
 }
 

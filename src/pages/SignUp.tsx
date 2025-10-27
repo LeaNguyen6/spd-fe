@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Eye, EyeOff, Mail, Lock, User, Loader2, LayoutDashboard, Wrench, TrendingUp } from "lucide-react";
-import { authService, logApiUsage } from "@/services/index";
+import { authService } from "@/services/index";
 import { tokenManager } from "@/services/authApi";
 import { toast } from "@/hooks/use-toast";
 import { z } from "zod";
@@ -119,7 +119,7 @@ const SignUp = () => {
                         Sign Up
                     </CardTitle>
                     <CardDescription>
-                        Create your account to access AssetAI Platform
+                        Create your account to access SP Digital AssetAI Platform
                     </CardDescription>
                 </CardHeader>
                 <CardContent>

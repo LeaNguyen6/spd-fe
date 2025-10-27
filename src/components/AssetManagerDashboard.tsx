@@ -80,8 +80,8 @@ const AssetManagerDashboard = () => {
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <MetricCard title="Total Assets" value={assets.length} icon={<Activity className="w-4 h-4" />} />
-                <MetricCard title="High-Risk Assets" value={assets.filter(asset => asset.healthScore > 60).length} trend="up" variant="warning" icon={<AlertTriangle className="w-4 h-4" />} />
-                <MetricCard title="Avg Health Score" value={`${(assets.reduce((acc, asset) => acc + asset.healthScore, 0) / assets.length).toFixed(2)}%`} trend="up" variant="success" icon={<TrendingUp className="w-4 h-4" />} />
+                <MetricCard title="High-Risk Assets" value={assets.filter(asset => asset.healthScore > 70).length} trend="up" variant="warning" icon={<AlertTriangle className="w-4 h-4" />} />
+                <MetricCard title="Avg Life Cycle Progress" value={`${(assets.reduce((acc, asset) => acc + asset.healthScore, 0) / assets.length || 0).toFixed(2)}%`} trend="up" variant="success" icon={<TrendingUp className="w-4 h-4" />} />
                 <MetricCard title="Pending Replacements" value={pendingReplacements} icon={<Wrench className="w-4 h-4" />} />
             </div>
 

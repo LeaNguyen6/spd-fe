@@ -3,7 +3,7 @@ import MetricCard from "@/components/MetricCard";
 import { Activity, TrendingUp, Loader2, ShieldAlert, ServerCrash } from "lucide-react";
 import { PrecisionRecallChart } from "./PrecisionRecallChart";
 import QualityMonitoring from "./QualityMonitoring";
-import { apiService, logApiUsage, type ReliabilityStats } from "@/services/index";
+import { apiService, type ReliabilityStats } from "@/services/index";
 import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -15,7 +15,7 @@ const ReliabilityEngineerDashboard = () => {
         const loadReliabilityStats = async () => {
             try {
                 setLoading(true);
-                logApiUsage("Loading reliability statistics");
+
                 const stats = await apiService.getReliabilityStats();
                 setReliabilityStats(stats);
             } catch (error) {
@@ -68,7 +68,7 @@ const ReliabilityEngineerDashboard = () => {
                                 />
                             )}
                         </div>
-
+                        {/* 
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="bg-card rounded-lg border p-6 shadow-card">
                                 <h3 className="text-lg font-semibold mb-4">AI Model Performance</h3>
@@ -124,7 +124,7 @@ const ReliabilityEngineerDashboard = () => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
                     </TabsContent>
 
                     <TabsContent value="quality-monitoring" className="space-y-6 mt-6">

@@ -8,13 +8,13 @@ interface AssetHealthCardProps {
   category: string;
   healthScore: number;
   confidence: number;
-  nextMaintenance: string;
+  nextMaintenance: number;
 }
 
 const AssetHealthCard = ({ assetName, category, healthScore, confidence, nextMaintenance }: AssetHealthCardProps) => {
   const isHighRisk = healthScore > 60;
-  const riskLevel = healthScore > 70 ? "Critical" : healthScore > 40 ? "High" : "Low";
-  const riskVariant = healthScore > 70 ? "destructive" : healthScore > 40 ? "warning" : "success";
+  const riskLevel = healthScore > 70 ? "High" : healthScore > 40 ? "Medium" : "Low";
+  const riskVariant = healthScore > 70 ? "destructive" : healthScore > 40 ? "secondary" : "success";
 
   return (
     <Card className="shadow-card hover:shadow-elevated transition-shadow">
@@ -33,7 +33,7 @@ const AssetHealthCard = ({ assetName, category, healthScore, confidence, nextMai
       <CardContent className="space-y-4">
         <div>
           <div className="flex justify-between text-sm mb-2">
-            <span className="text-muted-foreground">Health Score</span>
+            <span className="text-muted-foreground">Life Cycle Progress</span>
             <span className="font-semibold">{healthScore.toFixed(2)}%</span>
           </div>
           <Progress value={healthScore} className="h-2" />

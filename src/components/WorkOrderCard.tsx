@@ -16,9 +16,9 @@ interface WorkOrderCardProps {
 
 const WorkOrderCard = ({ assetId, type, priority, assignedTo, scheduledDate, status }: WorkOrderCardProps) => {
   const priorityVariant = {
-    low: "secondary",
+    low: "white",
     medium: "default",
-    high: "warning",
+    high: "secondary",
     critical: "destructive",
   };
 
