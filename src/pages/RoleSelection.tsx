@@ -32,17 +32,17 @@ const RoleSelection = () => {
         },
     ] as const;
 
-    const handleLogin = () => {
-        if (!selectedRole) {
-            toast({
-                title: "Please select a role",
-                description: "Choose your role to continue",
-                variant: "destructive",
-            });
-            return;
-        }
-
-        localStorage.setItem("userRole", selectedRole);
+    const handleSelectRole = (id: UserRole) => {
+        setSelectedRole(id);
+        // if (!selectedRole) {
+        //     toast({
+        //         title: "Please select a role",
+        //         description: "Choose your role to continue",
+        //         variant: "destructive",
+        //     });
+        //     return;
+        // }
+        localStorage.setItem("userRole", id);
         navigate("/dashboard");
     };
 
@@ -51,7 +51,7 @@ const RoleSelection = () => {
             <Card className="w-full max-w-4xl shadow-elegant">
                 <CardHeader className="text-center space-y-2 pb-6">
                     <CardTitle className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                        AssetAI Platform
+                        SP Digital AssetAI Platform
                     </CardTitle>
                     <CardDescription className="text-lg">
                         Select your role to access the dashboard (Demo Mode)
@@ -68,7 +68,9 @@ const RoleSelection = () => {
                                         ? "ring-2 ring-primary bg-primary/5"
                                         : "hover:bg-accent/50"
                                         }`}
-                                    onClick={() => setSelectedRole(role.id)}
+                                    onClick={() =>
+                                        handleSelectRole(role.id)
+                                    }
                                 >
                                     <CardHeader className="text-center space-y-3">
                                         <div className="mx-auto w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center">
@@ -83,14 +85,19 @@ const RoleSelection = () => {
                             );
                         })}
                     </div>
-
                     <Button
+                        className="w-full bg-gradient-primary hover:opacity-90 text-primary-foreground"
+                        size="lg"
+                    >
+                        Select Role to Continue to Dashboard
+                    </Button>
+                    {/* <Button
                         onClick={handleLogin}
                         className="w-full bg-gradient-primary hover:opacity-90 text-primary-foreground"
                         size="lg"
                     >
                         Continue to Dashboard
-                    </Button>
+                    </Button> */}
 
                     {/* <div className="text-center">
                         <p className="text-sm text-muted-foreground">
@@ -105,7 +112,7 @@ const RoleSelection = () => {
                     </div> */}
                 </CardContent>
             </Card>
-        </div>
+        </div >
     );
 };
 

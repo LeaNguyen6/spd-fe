@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react";
-import { authService, logApiUsage } from "@/services/index";
+import { authService } from "@/services/index";
 import { tokenManager } from "@/services/authApi";
 import { toast } from "@/hooks/use-toast";
 import { z } from "zod";
@@ -45,7 +45,7 @@ const SignIn = () => {
 
             // Store token and user data
             tokenManager.setToken(response?.data?.access_token);
-            // localStorage.setItem('userRole', response.user.role);
+            tokenManager.setRefreshToken(response?.data?.refresh_token);
 
             navigate("/role-selection");
             // navigate("/dashboard");
@@ -87,7 +87,7 @@ const SignIn = () => {
                         Sign In
                     </CardTitle>
                     <CardDescription>
-                        Enter your credentials to access AssetAI Platform
+                        Enter your credentials to access SP Digital AssetAI Platform
                     </CardDescription>
                 </CardHeader>
                 <CardContent>

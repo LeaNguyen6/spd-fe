@@ -4,9 +4,10 @@ import DashboardLayout from "@/components/DashboardLayout";
 import AssetManagerDashboard from "@/components/AssetManagerDashboard";
 import MaintenancePlannerDashboard from "@/components/MaintenancePlannerDashboard";
 import ReliabilityEngineerDashboard from "@/components/ReliabilityEngineerDashboard";
-import { apiService, type Asset, type WorkOrder, logApiUsage } from "@/services/index";
+import { apiService, type Asset, type WorkOrder } from "@/services/index";
 import { toast } from "@/hooks/use-toast";
 import { type UserRole } from "@/types/roles";
+import { authApi } from "@/services/authApi";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -31,7 +32,6 @@ const Dashboard = () => {
   //       apiService.getAssets(),
   //       apiService.getWorkOrders(),
   //     ]);
-  //     console.log('Assets:', assetsData);
   //     setAssets(assetsData);
   //     setWorkOrders(workOrdersData);
   //   } catch (error) {
@@ -47,7 +47,10 @@ const Dashboard = () => {
 
 
   const handleLogout = () => {
+    authApi.logout();
     localStorage.removeItem("userRole");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem('refreshToken');
     navigate("/");
   };
 

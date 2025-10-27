@@ -22,8 +22,3 @@ export type {
     LoginResponse,
     User
 } from './authApi';
-
-// Helper function to log API usage
-export const logApiUsage = (action: string) => {
-    console.log(`🔄 Real API: ${action}`);
-};

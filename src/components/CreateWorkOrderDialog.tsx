@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
-import { apiService, logApiUsage, type Asset } from "@/services/index";
+import { apiService, type Asset } from "@/services/index";
 import { toast } from "@/hooks/use-toast";
 import { z } from "zod";
 import dayjs from "dayjs";
@@ -76,7 +76,7 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated, assets }: CreateWorkOrderDi
       const validated = workOrderSchema.parse(formData);
 
       setLoading(true);
-      logApiUsage("Creating work order");
+
 
       // Format the scheduled date using dayjs
       const formattedDate = dayjs(validated.scheduledDate).format();
@@ -133,13 +133,21 @@ const CreateWorkOrderDialog = ({ onWorkOrderCreated, assets }: CreateWorkOrderDi
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="assetName">Asset Name</Label>
-            <Input
-              id="assetName"
+            <Select
               value={formData.assetName}
-              onChange={(e) => setFormData({ ...formData, assetName: e.target.value })}
-              placeholder="e.g., Pump System B-142"
-              maxLength={100}
-            />
+              onValueChange={(value: string) => setFormData({ ...formData, assetName: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select Asset" />
+              </SelectTrigger>
+              <SelectContent>
+                {assets.map((asset) => (
+                  <SelectItem key={asset.assetId} value={asset.assetName}>
+                    {asset.assetName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {errors.assetName && <p className="text-sm text-destructive">{errors.assetName}</p>}
           </div>
 

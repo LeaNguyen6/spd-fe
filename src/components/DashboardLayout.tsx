@@ -32,10 +32,10 @@ const DashboardLayout = ({ children, userRole, onLogout }: DashboardLayoutProps)
               <div className="flex items-center space-x-3">
                 <img
                   src="/logospd.png"
-                  alt="SPD Logo"
+                  alt="SP Digital Logo"
                   className="w-8 h-8 object-contain"
                 />
-                <h1 className="text-xl font-bold text-primary-foreground">SPD Asset Platform</h1>
+                <h1 className="text-xl font-bold text-primary-foreground">SP Digital AssetAI Platform</h1>
               </div>
               <Badge
                 variant="secondary"
