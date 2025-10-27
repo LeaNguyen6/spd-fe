@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import MetricCard from "@/components/MetricCard";
 import WorkOrderCard from "@/components/WorkOrderCard";
 import CreateWorkOrderDialog from "@/components/CreateWorkOrderDialog";
-import { Activity, TrendingUp, Wrench, RefreshCw } from "lucide-react";
+import { Activity, TrendingUp, Wrench, RefreshCw, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { apiService, type Asset, type WorkOrder } from "@/services/index";
 import { toast } from "@/hooks/use-toast";
@@ -129,6 +129,8 @@ const MaintenancePlannerDashboard = () => {
                     variant={highPriorityThisWeek > 0 ? "warning" : "default"}
                     icon={<Activity className="w-4 h-4" />}
                 />
+
+                <MetricCard title="Completed Work Orders" value={workOrders.filter(order => order.status === "COMPLETED").length} icon={<CheckCircle className="w-4 h-4" />} />
                 <MetricCard
                     title="Completion Rate"
                     value={`${completionRate}%`}
@@ -136,7 +138,6 @@ const MaintenancePlannerDashboard = () => {
                     variant={completionRate >= 90 ? "success" : completionRate >= 70 ? "default" : "warning"}
                     icon={<TrendingUp className="w-4 h-4" />}
                 />
-                <MetricCard title="Resource Utilization" value="87%" icon={<Activity className="w-4 h-4" />} />
             </div>
 
             <div>

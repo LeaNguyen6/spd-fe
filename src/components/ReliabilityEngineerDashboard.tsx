@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import MetricCard from "@/components/MetricCard";
-import { Activity, TrendingUp, Loader2, ShieldAlert, ServerCrash } from "lucide-react";
+import { Activity, TrendingUp, Loader2, ShieldAlert, AlertTriangle } from "lucide-react";
 import { PrecisionRecallChart } from "./PrecisionRecallChart";
 import QualityMonitoring from "./QualityMonitoring";
 import { apiService, type ReliabilityStats } from "@/services/index";
@@ -56,7 +56,7 @@ const ReliabilityEngineerDashboard = () => {
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                             <MetricCard title="Model Accuracy" value={`${(reliabilityStats?.f1_score * 100).toFixed(2)}%`} variant="success" icon={<TrendingUp className="w-4 h-4" />} />
                             <MetricCard title="Mean Squared Error" value={`${reliabilityStats?.mean_squared_error.toFixed(2) || 0}`} icon={<ShieldAlert className="w-4 h-4" />} />
-                            <MetricCard title="Mean Absolute Error" value={`${reliabilityStats?.mean_absolute_error.toFixed(2) || 0}`} icon={<ServerCrash className="w-4 h-4" />} />
+                            <MetricCard title="Mean Absolute Error" value={`${reliabilityStats?.mean_absolute_error.toFixed(2) || 0}`} variant="warning" icon={<AlertTriangle className="w-4 h-4" />} />
                             <MetricCard title="Mean Absolute Percentage Error" value={`${reliabilityStats?.mean_absolute_percentage_error.toFixed(2) || 0}%`} icon={<Activity className="w-4 h-4" />} />
                         </div>
 
