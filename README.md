@@ -1,6 +1,6 @@
-# Smart Plant Nexus
+# SP Digital AssetAI Platform
 
-A modern, intelligent plant maintenance management system built with React, TypeScript, and Vite. Smart Plant Nexus provides comprehensive asset management, predictive maintenance planning, and quality monitoring capabilities integrated with SAP PM systems.
+A modern, intelligent predictive maintenance management system built with React, TypeScript, and Vite. SP Digital AssetAI Platform provides comprehensive asset management, predictive maintenance planning, and quality monitoring capabilities integrated with SAP PM systems.
 
 ## 🚀 Features
 
@@ -54,7 +54,7 @@ Create a `.env` file in the root directory with the following variables:
 
 ```env
 # API Configuration
-VITE_API_BASE_URL=http://localhost:3000/api
+VITE_API_BASE_URL=http://localhost:8080/api
 
 # Environment Mode
 VITE_ENV=development
@@ -111,7 +111,7 @@ npm run preview
 ## 📁 Project Structure
 
 ```
-smart-plant-nexus-main/
+spd-fe/
 ├── public/                      # Static assets
 │   └── robots.txt
 ├── src/
@@ -306,7 +306,7 @@ For support and questions, please contact the development team or open an issue 
 
 ---
 
-**Current Branch**: `feat/create-work-order`  
+**Current Branch**: `develop`  
 **Repository**: [LeaNguyen6/spd-fe](https://github.com/LeaNguyen6/spd-fe)
 
 For more detailed API documentation, please refer to [API_SETUP.md](./API_SETUP.md)
