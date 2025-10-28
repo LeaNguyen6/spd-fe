@@ -183,13 +183,20 @@ const QualityMonitoring = () => {
                         <CardTitle className="text-base">Data Quality: Missing Values</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <BarChart
+                        {
+                            missingValuesData.length === 0 ? (
+                                <div className="mt-12 text-sm text-center text-muted-foreground">
+                                    No data available
+                                </div>
+                            ) : ( <BarChart
                             data={missingValuesData}
                             bars={[
                                 { dataKey: 'count', fill: '#1eb3e1ff', name: 'Missing Values' }
                             ]}
                             height={250}
-                        />
+                        />)
+                        }
+                       
                     </CardContent>
                 </Card>
 
@@ -198,13 +205,18 @@ const QualityMonitoring = () => {
                         <CardTitle className="text-base">Data Quality: Outliers</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <BarChart
+                        {outliersData.length === 0 ? (
+                            <div className="mt-12 text-sm text-center text-muted-foreground">
+                                No data available
+                            </div>
+                        ) : ( <BarChart
                             data={outliersData}
                             bars={[
                                 { dataKey: 'count', fill: '#f59e0b', name: 'Outliers' }
                             ]}
                             height={250}
-                        />
+                        />)}
+                       
                     </CardContent>
                 </Card>
             </div>
@@ -216,13 +228,18 @@ const QualityMonitoring = () => {
                         <CardTitle className="text-base">Data Drift: Top 5 Engines</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <BarChart
-                            data={dataDriftData}
+                        {dataDriftData.length === 0 ? (
+                            <div className="mt-12 text-sm text-center text-muted-foreground">
+                                No data available
+                            </div>
+                        ) : (
+                            <BarChart
+                                data={dataDriftData}
                             bars={[
                                 { dataKey: 'count', fill: 'hsl(var(--primary))' }
                             ]}
                             height={250}
-                        />
+                        />)}
                     </CardContent>
                 </Card>
 
@@ -231,13 +248,19 @@ const QualityMonitoring = () => {
                         <CardTitle className="text-base">System Health Overview</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <PieChart
-                            data={systemHealthData}
-                            height={250}
-                            showLegend={true}
-                            innerRadius={50}
-                            outerRadius={90}
-                        />
+                        {systemHealthData.length === 0 ? (
+                            <div className="mt-12 text-sm text-center text-muted-foreground">
+                                No data available
+                            </div>
+                        ) : (
+                            <PieChart
+                                data={systemHealthData}
+                                height={250}
+                                showLegend={true}
+                                innerRadius={50}
+                                outerRadius={90}
+                            />
+                        )}
                     </CardContent>
                 </Card>
             </div>
