@@ -47,8 +47,9 @@ const SignIn = () => {
             tokenManager.setToken(response?.data?.access_token);
             tokenManager.setRefreshToken(response?.data?.refresh_token);
 
-            navigate("/role-selection");
-            // navigate("/dashboard");
+            // navigate("/role-selection");
+            localStorage.setItem("userRole", response?.data?.role);
+            navigate("/dashboard");
         } catch (error) {
             if (error instanceof z.ZodError) {
                 const fieldErrors: Record<string, string> = {};

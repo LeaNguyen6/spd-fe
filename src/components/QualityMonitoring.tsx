@@ -185,7 +185,7 @@ const QualityMonitoring = () => {
                     <CardContent>
                         {
                             missingValuesData.length === 0 ? (
-                                <div className="mt-12 text-sm text-center text-muted-foreground">
+                                <div className="my-12 text-sm text-center text-muted-foreground">
                                     No data available
                                 </div>
                             ) : (<BarChart
@@ -206,7 +206,7 @@ const QualityMonitoring = () => {
                     </CardHeader>
                     <CardContent>
                         {outliersData.length === 0 ? (
-                            <div className="mt-12 text-sm text-center text-muted-foreground">
+                            <div className="my-12 text-sm text-center text-muted-foreground">
                                 No data available
                             </div>
                         ) : (<BarChart
@@ -229,7 +229,7 @@ const QualityMonitoring = () => {
                     </CardHeader>
                     <CardContent>
                         {dataDriftData.length === 0 ? (
-                            <div className="mt-12 text-sm text-center text-muted-foreground">
+                            <div className="my-12 text-sm text-center text-muted-foreground">
                                 No data available
                             </div>
                         ) : (
@@ -249,7 +249,7 @@ const QualityMonitoring = () => {
                     </CardHeader>
                     <CardContent>
                         {systemHealthData.length === 0 ? (
-                            <div className="mt-12 text-sm text-center text-muted-foreground">
+                            <div className="my-12 text-sm text-center text-muted-foreground">
                                 No data available
                             </div>
                         ) : (

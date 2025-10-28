@@ -55,9 +55,9 @@ const ReliabilityEngineerDashboard = () => {
                     <TabsContent value="model-performance" className="space-y-6 mt-6">
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                             <MetricCard title="Model Accuracy" value={`${(reliabilityStats?.f1_score * 100).toFixed(2)}%`} variant="success" icon={<TrendingUp className="w-4 h-4" />} />
-                            <MetricCard title="Mean Squared Error" value={`${reliabilityStats?.mean_squared_error.toFixed(2) || 0} cycles`} icon={<ShieldAlert className="w-4 h-4" />} />
-                            <MetricCard title="Mean Absolute Error" value={`${reliabilityStats?.mean_absolute_error.toFixed(2) || 0} cycles`} variant="warning" icon={<AlertTriangle className="w-4 h-4" />} />
-                            <MetricCard title="Mean Absolute Percentage Error" value={`${reliabilityStats?.mean_absolute_percentage_error.toFixed(2) || 0}%`} icon={<Activity className="w-4 h-4" />} />
+                            <MetricCard title="Mean Squared Error" value={`${reliabilityStats?.mean_squared_error?.toFixed(2) || 0} cycles`} icon={<ShieldAlert className="w-4 h-4" />} />
+                            <MetricCard title="Mean Absolute Error" value={`${reliabilityStats?.mean_absolute_error?.toFixed(2) || 0} cycles`} variant="warning" icon={<AlertTriangle className="w-4 h-4" />} />
+                            <MetricCard title="Mean Absolute Percentage Error" value={`${reliabilityStats?.mean_absolute_percentage_error?.toFixed(2) || 0}%`} icon={<Activity className="w-4 h-4" />} />
                         </div>
 
                         <div className="bg-card rounded-lg border p-6 shadow-card">
