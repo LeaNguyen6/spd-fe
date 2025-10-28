@@ -7,9 +7,10 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import TablePagination from "@/components/TablePagination";
 import { cn } from "@/lib/utils";
 
-export interface TableColumn<T = Record<string, unknown>> {
+export interface TableColumn<T extends Record<string, unknown> = Record<string, unknown>> {
     key: string;
     header: string;
     accessor?: keyof T | ((row: T) => unknown);
@@ -19,7 +20,7 @@ export interface TableColumn<T = Record<string, unknown>> {
     width?: string | number;
 }
 
-export interface TableDataProps<T = Record<string, unknown>> {
+export interface TableDataProps<T extends Record<string, unknown> = Record<string, unknown>> {
     data: T[];
     columns: TableColumn<T>[];
     className?: string;
@@ -27,9 +28,20 @@ export interface TableDataProps<T = Record<string, unknown>> {
     loading?: boolean;
     onRowClick?: (row: T, index: number) => void;
     rowClassName?: string | ((row: T, index: number) => string);
+    // Pagination props
+    pagination?: {
+        enabled: boolean;
+        currentPage?: number;
+        pageSize?: number;
+        pageSizeOptions?: number[];
+        onPageChange?: (page: number) => void;
+        onPageSizeChange?: (pageSize: number) => void;
+        showPageSizeSelector?: boolean;
+        showItemsInfo?: boolean;
+    };
 }
 
-const TableData = <T extends Record<string, unknown>>({
+const TableData = <T extends Record<string, unknown> = Record<string, unknown>>({
     data,
     columns,
     className,
@@ -37,7 +49,37 @@ const TableData = <T extends Record<string, unknown>>({
     loading = false,
     onRowClick,
     rowClassName,
+    pagination,
 }: TableDataProps<T>) => {
+    // Pagination state
+    const [currentPage, setCurrentPage] = React.useState(pagination?.currentPage || 1);
+    const [pageSize, setPageSize] = React.useState(pagination?.pageSize || 10);
+
+    // Calculate pagination
+    const totalItems = data.length;
+    const totalPages = Math.ceil(totalItems / pageSize);
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedData = pagination?.enabled ? data.slice(startIndex, endIndex) : data;
+
+    // Handle page changes
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        pagination?.onPageChange?.(page);
+    };
+
+    const handlePageSizeChange = (newPageSize: number) => {
+        setPageSize(newPageSize);
+        setCurrentPage(1); // Reset to first page
+        pagination?.onPageSizeChange?.(newPageSize);
+    };
+
+    // Reset to first page when data changes
+    React.useEffect(() => {
+        if (pagination?.enabled && currentPage > totalPages && totalPages > 0) {
+            setCurrentPage(1);
+        }
+    }, [data.length, totalPages, currentPage, pagination?.enabled]);
     // Get value from row using accessor
     const getCellValue = (row: T, column: TableColumn<T>) => {
         if (column.accessor) {
@@ -86,52 +128,72 @@ const TableData = <T extends Record<string, unknown>>({
     }
 
     return (
-        <div className={cn("rounded-md border", className)}>
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        {columns.map((column) => (
-                            <TableHead
-                                key={column.key}
-                                className={column.headerClassName}
-                                style={{ width: column.width }}
-                            >
-                                {column.header}
-                            </TableHead>
-                        ))}
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {data.length === 0 ? (
+        <div className="space-y-4">
+            <div className={cn("rounded-md border", className)}>
+                <Table>
+                    <TableHeader>
                         <TableRow>
-                            <TableCell colSpan={columns.length} className="text-center py-8">
-                                <div className="text-muted-foreground">{emptyMessage}</div>
-                            </TableCell>
+                            {columns.map((column) => (
+                                <TableHead
+                                    key={column.key}
+                                    className={column.headerClassName}
+                                    style={{ width: column.width }}
+                                >
+                                    {column.header}
+                                </TableHead>
+                            ))}
                         </TableRow>
-                    ) : (
-                        data.map((row, index) => (
-                            <TableRow
-                                key={index}
-                                className={cn(
-                                    onRowClick && "cursor-pointer hover:bg-muted/50",
-                                    getRowClassName(row, index)
-                                )}
-                                onClick={() => onRowClick?.(row, index)}
-                            >
-                                {columns.map((column) => (
-                                    <TableCell
-                                        key={column.key}
-                                        className={column.className}
-                                        style={{ width: column.width }}
-                                    >
-                                        {renderCell(row, column, index)}
-                                    </TableCell>
-                                ))}
+                    </TableHeader>
+                    <TableBody>
+                        {paginatedData.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={columns.length} className="text-center py-8">
+                                    <div className="text-muted-foreground">{emptyMessage}</div>
+                                </TableCell>
                             </TableRow>
-                        ))
-                    )}
-                </TableBody>
-            </Table>
+                        ) : (
+                            paginatedData.map((row, index) => {
+                                const actualIndex = pagination?.enabled ? startIndex + index : index;
+                                return (
+                                    <TableRow
+                                        key={actualIndex}
+                                        className={cn(
+                                            onRowClick && "cursor-pointer hover:bg-muted/50",
+                                            getRowClassName(row, actualIndex)
+                                        )}
+                                        onClick={() => onRowClick?.(row, actualIndex)}
+                                    >
+                                        {columns.map((column) => (
+                                            <TableCell
+                                                key={column.key}
+                                                className={column.className}
+                                                style={{ width: column.width }}
+                                            >
+                                                {renderCell(row, column, actualIndex)}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                );
+                            })
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
+
+            {/* Pagination */}
+            {pagination?.enabled && totalItems > 0 && (
+                <TablePagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    pageSize={pageSize}
+                    totalItems={totalItems}
+                    onPageChange={handlePageChange}
+                    onPageSizeChange={handlePageSizeChange}
+                    pageSizeOptions={pagination.pageSizeOptions}
+                    showPageSizeSelector={pagination.showPageSizeSelector}
+                    showItemsInfo={pagination.showItemsInfo}
+                />
+            )}
         </div>
     );
 };
