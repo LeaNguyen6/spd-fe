@@ -5,118 +5,99 @@ import BarChart from "@/components/charts/BarChart";
 import PieChart from "@/components/charts/PieChart";
 import TableData, { TableColumn } from "@/components/TableData";
 import { AlertTriangle, CheckCircle, Clock, Database } from "lucide-react";
+import { useEffect, useState } from "react";
+import { sapApi, MonitorsDrift, MonitorsModelDrift } from "@/services/sapApi";
 
 const QualityMonitoring = () => {
-    // Mock data for Data Quality: Missing Values & Outliers
-    const missingValuesData = [
-        { name: 'vibration_x', Missing: 15, Outliers: 0 },
-        { name: 'fuel_flow', Missing: 5, Outliers: 0 },
-        { name: 'pressure_1', Missing: 0, Outliers: 17 },
-        { name: 'temp_2', Missing: 0, Outliers: 8 },
-        { name: 'vibration_y', Missing: 0, Outliers: 3 },
-    ];
+    const [monitorsDrift, setMonitorsDrift] = useState<MonitorsDrift | null>(null);
+    const [monitorsModelDrift, setMonitorsModelDrift] = useState<MonitorsModelDrift | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Mock data for Data Drift: Top 5 Features (PSI Score)
-    const dataDriftData = [
-        { name: 'temp_1', psi: 0.85 },
-        { name: 'pressure_1', psi: 0.65 },
-        { name: 'fuel_flow', psi: 0.55 },
-        { name: 'vibration_1', psi: 0.45 },
-        { name: 'vibration_2', psi: 0.35 },
-    ];
+    useEffect(() => {
+        const fetchMonitorsData = async () => {
+            try {
+                setIsLoading(true);
+                const [driftData, modelDriftData] = await Promise.all([
+                    sapApi.getMonitorsDrift(),
+                    sapApi.getMonitorsModelDrift()
+                ]);
+                setMonitorsDrift(driftData);
+                setMonitorsModelDrift(modelDriftData);
+            } catch (error) {
+                console.error("Failed to fetch monitors data:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-    // Mock data for Model Drift: RUL Change Rate by Engine
-    const modelDriftData = [
-        { name: 'E4782', rate: 2.5 },
-        { name: 'E2785', rate: 2.2 },
-        { name: 'E1041', rate: 1.8 },
-        { name: 'E1098', rate: 1.6 },
-        { name: 'E3095', rate: 1.2 },
-        { name: 'E2904', rate: 1.1 },
-        { name: 'E4813', rate: 1.0 },
-        { name: 'E4475', rate: 1.0 },
-    ];
+        fetchMonitorsData();
+    }, []);
+    // Transform API data for charts
+    const missingValuesData = monitorsDrift?.top_missing_values.slice(0, 5).map(item => ({
+        name: item.engine_id,
+        count: item.count
+    })) || [];
 
-    // Mock data for System Health Overview
-    const systemHealthData = [
-        { name: 'Healthy', value: 27, fill: '#1eb3e1ff' },
-        { name: 'Warning', value: 8, fill: 'hsl(var(--warning))' },
-        { name: 'Critical', value: 3, fill: 'hsl(var(--destructive))' },
-    ];
+    const outliersData = monitorsDrift?.top_outliers.slice(0, 5).map(item => ({
+        name: item.engine_id,
+        count: item.count
+    })) || [];
 
-    // Mock data for Critical Issues & Alerts
-    const criticalIssues = [
-        {
-            timestamp: '2025-10-26 14:23',
-            category: 'Data Drift',
-            feature: 'sensor_temperature_1',
-            issue: 'PSI 0.21 (High drift)',
-            severity: 'High'
-        },
-        {
-            timestamp: '2025-10-26 14:15',
-            category: 'Model Drift',
-            feature: 'Engine_E4782',
-            issue: 'Unstable predictions (rate: 2.7%)',
-            severity: 'Unstable'
-        },
-        {
-            timestamp: '2025-10-26 13:45',
-            category: 'Data Quality',
-            feature: 'sensor_vibration_x',
-            issue: '18.5% missing values',
-            severity: 'High'
-        },
-        {
-            timestamp: '2025-10-26 13:30',
-            category: 'Model Drift',
-            feature: 'Engine_E2103',
-            issue: 'Unstable predictions (rate: 2.06)',
-            severity: 'Unstable'
-        },
-        {
-            timestamp: '2025-10-26 12:30',
-            category: 'Data Quality',
-            feature: 'sensor_pressure_3',
-            issue: '12 outliers detected (Z-score)',
-            severity: 'Medium'
-        },
-        {
-            timestamp: '2025-10-26 12:10',
-            category: 'Data Drift',
-            feature: 'sensor_pressure_2',
-            issue: 'PSI 0.165 (Medium drift)',
-            severity: 'Medium'
-        },
-        {
-            timestamp: '2025-10-26 11:50',
-            category: 'Data Quality',
-            feature: 'fuel_flow_rate',
-            issue: '6.2% missing values',
-            severity: 'Medium'
-        },
-    ];
+    // Data Drift: Top 5 Features
+    const dataDriftData = monitorsDrift?.top_data_drift.slice(0, 5).map(item => ({
+        name: item.engine_id,
+        count: item.count
+    })) || [];
+
+    // System Health Overview from data quality
+    const systemHealthData = monitorsDrift ? [
+        { name: 'Healthy', value: monitorsDrift.data_quality.healthy_engines, fill: '#1eb3e1ff' },
+        { name: 'Medium ', value: monitorsDrift.data_quality.medium_issue_engines, fill: 'hsl(var(--warning))' },
+        { name: 'Critical', value: monitorsDrift.data_quality.critical_issue_engines, fill: 'hsl(var(--destructive))' },
+    ] : [];
+
+    // Critical Issues from API
+    const criticalIssues = monitorsDrift?.critical_issues || [];
+
+    // Calculate data quality score
+    const dataQualityScore = monitorsDrift?.data_quality.score
+        ? `${monitorsDrift.data_quality.score.toFixed(1)}%`
+        : 'N/A';
+
+    const healthyFeatures = monitorsDrift?.data_quality.healthy_engines || 0;
+    const totalFeatures = monitorsDrift?.data_quality.total_engines || 0;
+
+    // Calculate model stability
+    const stableEngines = monitorsModelDrift
+        ? monitorsModelDrift.total_engines - monitorsModelDrift.unstable_engines
+        : 0;
+    const modelStability = monitorsModelDrift?.total_engines
+        ? `${((stableEngines / monitorsModelDrift.total_engines) * 100).toFixed(0)}%`
+        : 'N/A';
+
+    // Count critical issues
+    const criticalIssuesCount = monitorsDrift?.critical_issues.length || 0;
 
     const getSeverityVariant = (severity: string) => {
         switch (severity.toLowerCase()) {
             case 'high':
             case 'critical':
                 return 'destructive';
-            case 'unstable':
-                return 'secondary';
             case 'medium':
                 return 'default';
+            case 'unstable':
+                return 'secondary';
             default:
                 return 'outline';
         }
     };
 
     // Define columns for the critical issues table
-    const criticalIssuesColumns: TableColumn<typeof criticalIssues[0]>[] = [
+    const criticalIssuesColumns: TableColumn<Record<string, unknown>>[] = [
         {
-            key: 'timestamp',
-            header: 'TIMESTAMP',
-            accessor: 'timestamp',
+            key: 'engine_id',
+            header: 'ENGINE',
+            accessor: 'engine_id',
             className: 'text-xs',
             headerClassName: 'text-sm font-medium text-muted-foreground',
         },
@@ -129,7 +110,7 @@ const QualityMonitoring = () => {
         },
         {
             key: 'feature',
-            header: 'FEATURE / ENGINE',
+            header: 'FEATURE',
             accessor: 'feature',
             className: 'text-xs font-mono',
             headerClassName: 'text-sm font-medium text-muted-foreground',
@@ -147,12 +128,20 @@ const QualityMonitoring = () => {
             accessor: 'severity',
             headerClassName: 'text-sm font-medium text-muted-foreground',
             render: (value) => (
-                <Badge variant={getSeverityVariant(value as string)} className="text-xs">
+                <Badge variant={getSeverityVariant(value as string)} className="text-xs uppercase">
                     {value as string}
                 </Badge>
             ),
         },
     ];
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-64">
+                <p className="text-muted-foreground">Loading monitors data...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">
@@ -160,27 +149,27 @@ const QualityMonitoring = () => {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <MetricCard
                     title="DATA QUALITY"
-                    value="92.5%"
-                    subtitle="27/30 features healthy"
+                    value={dataQualityScore}
+                    subtitle={`${healthyFeatures}/${totalFeatures} engines healthy`}
                     icon={<Database className="w-4 h-4" />}
                     variant="success"
                 />
                 <MetricCard
-                    title="DATA DRIFT (PSI)"
-                    value="0.21"
-                    subtitle="4 features drifted"
+                    title="DATA DRIFT"
+                    value={monitorsDrift?.top_data_drift.length.toString() || '0'}
+                    subtitle="engines with drift"
                     icon={<AlertTriangle className="w-4 h-4" />}
                     variant="warning"
                 />
                 <MetricCard
                     title="MODEL STABILITY"
-                    value="75%"
-                    subtitle="15/20 engines stable"
+                    value={modelStability}
+                    subtitle={`${stableEngines}/${monitorsModelDrift?.total_engines || 0} engines stable`}
                     icon={<CheckCircle className="w-4 h-4" />}
                 />
                 <MetricCard
                     title="CRITICAL ISSUES"
-                    value="7"
+                    value={criticalIssuesCount.toString()}
                     subtitle="Requires attention"
                     icon={<Clock className="w-4 h-4" />}
                     variant="destructive"
@@ -191,14 +180,13 @@ const QualityMonitoring = () => {
             <div className="grid gap-4 md:grid-cols-2">
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-base">Data Quality: Missing Values & Outliers</CardTitle>
+                        <CardTitle className="text-base">Data Quality: Missing Values</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <BarChart
                             data={missingValuesData}
                             bars={[
-                                { dataKey: 'Missing', fill: '#1eb3e1ff', name: 'Missing' },
-                                { dataKey: 'Outliers', fill: '#f59e0b', name: 'Outliers' }
+                                { dataKey: 'count', fill: '#1eb3e1ff', name: 'Missing Values' }
                             ]}
                             height={250}
                         />
@@ -207,13 +195,13 @@ const QualityMonitoring = () => {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-base">Data Drift: Top 5 Features (PSI Score)</CardTitle>
+                        <CardTitle className="text-base">Data Quality: Outliers</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <BarChart
-                            data={dataDriftData}
+                            data={outliersData}
                             bars={[
-                                { dataKey: 'psi', fill: 'hsl(var(--primary))' }
+                                { dataKey: 'count', fill: '#f59e0b', name: 'Outliers' }
                             ]}
                             height={250}
                         />
@@ -225,13 +213,13 @@ const QualityMonitoring = () => {
             <div className="grid gap-4 md:grid-cols-2">
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-base">Model Drift: RUL Change Rate by Engine</CardTitle>
+                        <CardTitle className="text-base">Data Drift: Top 5 Engines</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <BarChart
-                            data={modelDriftData}
+                            data={dataDriftData}
                             bars={[
-                                { dataKey: 'rate', fill: '#1eb3e1ff' }
+                                { dataKey: 'count', fill: 'hsl(var(--primary))' }
                             ]}
                             height={250}
                         />
@@ -261,7 +249,7 @@ const QualityMonitoring = () => {
                 </CardHeader>
                 <CardContent>
                     <TableData
-                        data={criticalIssues}
+                        data={criticalIssues as Record<string, unknown>[]}
                         columns={criticalIssuesColumns}
                         emptyMessage="No critical issues found"
                     />

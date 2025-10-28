@@ -192,7 +192,7 @@ const SignUp = () => {
                             </p>
                         </div>
 
-                        {/* <div className="space-y-2">
+                        <div className="space-y-2">
                             <Label htmlFor="role">Role</Label>
                             <Select
                                 value={formData.role}
@@ -224,7 +224,7 @@ const SignUp = () => {
                                 </p>
                             )}
                             {errors.role && <p className="text-sm text-destructive">{errors.role}</p>}
-                        </div> */}
+                        </div>
 
                         <Button
                             type="submit"

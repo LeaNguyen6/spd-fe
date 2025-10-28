@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project uses Axios for HTTP requests with authentication token management and real API integration for SAP PM operations.
+This project uses Axios for HTTP requests with authentication token management, automatic token refresh, and real API integration for SAP PM operations. The system provides seamless authentication flows with JWT tokens and comprehensive error handling.
 
 ## Installation
 
@@ -19,7 +19,7 @@ npm install axios
 Create a `.env` file with the following variables:
 
 ```env
-VITE_API_BASE_URL=http://localhost:3000/api
+VITE_API_BASE_URL=http://localhost:8080/api
 VITE_ENV=development
 ```
 
@@ -30,11 +30,11 @@ VITE_ENV=development
 ```
 src/
 ├── lib/
-│   └── apiClient.ts          # Axios configuration with interceptors
+│   └── apiClient.ts          # Axios configuration with interceptors and token refresh
 ├── services/
-│   ├── index.ts              # Service exports and API integration
+│   ├── index.ts              # Service exports and type definitions
 │   ├── sapApi.ts             # Real API service using Axios
-│   └── authApi.ts            # Authentication API service
+│   └── authApi.ts            # Authentication API service with token management
 ├── hooks/
 │   └── useAuth.tsx           # Authentication context and hooks
 ├── components/
@@ -320,8 +320,6 @@ tokenManager.removeToken();
 ### Authentication Endpoints
 
 - `POST /auth/login` - User login
-- `POST /auth/logout` - User logout
-- `GET /auth/profile` - Get user profile
 - `POST /auth/refresh` - Refresh token
 - `POST /auth/register` - Register new user
 
