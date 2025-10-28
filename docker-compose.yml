@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spd_frontend
+    restart: on-failure
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - VITE_API_BASE_URL=http://localhost:8080/api
+    networks:
+      - spd-network
+
+networks:
+  spd-network:
+    driver: bridge
+    external: true
