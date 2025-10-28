@@ -41,12 +41,12 @@ export const authApi = {
     },
 
     // Logout user
-    logout: async (): Promise<void> => {
-        await apiClient.post('/auth/logout');
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('userRole');
-    },
+    // logout: async (): Promise<void> => {
+    //     await apiClient.post('/auth/logout');
+    //     localStorage.removeItem('authToken');
+    //     localStorage.removeItem('refreshToken');
+    //     localStorage.removeItem('userRole');
+    // },
 
     // Get current user profile
     // getProfile: async (): Promise<User> => {

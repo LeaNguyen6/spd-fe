@@ -179,7 +179,16 @@ const SignIn = () => {
 
                     <div className="mt-4 p-3 bg-muted rounded-lg">
                         <p className="text-xs text-muted-foreground text-center">
-                            Demo Credentials: Any email with password minimum 6 characters
+                            Demo Account
+                        </p>
+                        <p className="text-xs text-muted-foreground text-center">
+                            assetsAdmin@example.com / 123456
+                        </p>
+                        <p className="text-xs text-muted-foreground text-center">
+                            maintenanceAdmin@example.com / 123456
+                        </p>
+                        <p className="text-xs text-muted-foreground text-center">
+                            reliabilityAdmin@example.com / 123456
                         </p>
                     </div>
                 </CardContent>

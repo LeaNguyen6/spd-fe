@@ -47,7 +47,7 @@ const AssetHealthCard = ({ assetName, category, healthScore, confidence, nextMai
         </div>
         <div className="pt-2 border-t">
           <span className="text-sm text-muted-foreground">Remaining Useful Life : </span>
-          <span className="font-semibold">{nextMaintenance} days</span>
+          <span className="font-semibold">{nextMaintenance.toFixed(2)} days</span>
         </div>
       </CardContent>
     </Card>
