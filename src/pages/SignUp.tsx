@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Eye, EyeOff, Mail, Lock, User, Loader2, LayoutDashboard, Wrench, TrendingUp } from "lucide-react";
 import { authService } from "@/services/index";
-import { tokenManager } from "@/services/authApi";
 import { toast } from "@/hooks/use-toast";
 import { z } from "zod";
 
@@ -19,7 +18,7 @@ interface RegisterRequest {
 }
 
 const registerSchema = z.object({
-    full_name: z.string().max(50, "Full name is too long"),
+    full_name: z.string().max(50, "Full name is too long").min(1, "Full name is required"),
     email: z.string().email("Please enter a valid email address"),
     password: z.string()
         .min(6, "Password must be at least 6 characters"),

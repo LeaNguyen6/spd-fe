@@ -1,3 +1,4 @@
+import { authApi } from '@/services/authApi';
 import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
 // API Configuration
@@ -79,19 +80,13 @@ apiClient.interceptors.response.use(
                 if (!refreshToken) {
                     throw new Error('No refresh token available');
                 }
+                const response = await authApi.refreshToken();
 
-                const response = await axios.post(`${API_BASE_URL}/v1/auth/refresh`, {
-                    refresh_token: refreshToken
-                });
 
-                const { access_token, refresh_token: newRefreshToken } = response.data.data;
+                const { refresh_token: access_token } = response;
 
                 // Update stored tokens
                 localStorage.setItem('authToken', access_token);
-                if (newRefreshToken) {
-                    localStorage.setItem('refreshToken', newRefreshToken);
-                }
-
                 // Update the original request with new token
                 if (originalRequest.headers) {
                     originalRequest.headers.Authorization = `Bearer ${access_token}`;
