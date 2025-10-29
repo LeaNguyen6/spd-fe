@@ -54,7 +54,7 @@ Create a `.env` file in the root directory with the following variables:
 
 ```env
 # API Configuration
-VITE_API_BASE_URL=http://localhost:49231/api
+VITE_API_BASE_URL=http://localhost:49213/api
 
 # Environment Mode
 VITE_ENV=development
