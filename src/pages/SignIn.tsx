@@ -183,13 +183,13 @@ const SignIn = () => {
                             Demo Account
                         </p>
                         <p className="text-xs text-muted-foreground text-center">
-                            assetsAdmin@example.com / 123456
+                            Role Asset manager: leechunhow@spgroup.com.sg / 123456
                         </p>
                         <p className="text-xs text-muted-foreground text-center">
-                            maintenanceAdmin@example.com / 123456
+                            Role Maintenance Planner: ERICLIM@spgroup.com.sg / 123456
                         </p>
                         <p className="text-xs text-muted-foreground text-center">
-                            reliabilityAdmin@example.com / 123456
+                            Role Reliability Admin:  hieunguyen@spgroup.com.sg / 123456
                         </p>
                     </div>
                 </CardContent>
