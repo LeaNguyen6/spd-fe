@@ -181,7 +181,7 @@ interface WorkOrder {
   priority: "critical" | "high" | "medium" | "low";
   assignedTo: string;
   scheduledDate: string;
-  status: "pending" | "in-progress" | "completed";
+  status: "pending" | "in_progress" | "completed";
   sapOrderNumber?: string;
 }
 ```

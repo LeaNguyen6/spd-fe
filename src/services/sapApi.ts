@@ -35,7 +35,7 @@ export interface WorkOrder {
     priority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
     assignedTo: string;
     scheduledDate: string;
-    status: "PENDING" | "IN-PROGRESS" | "COMPLETED";
+    status: "PENDING" | "IN_PROGRESS" | "COMPLETED";
     sapOrderNumber?: string;
 }
 
@@ -46,7 +46,7 @@ export interface CreateWorkOrderRequest {
     assigned_to: string;
     scheduled_date: string;
     sap_order_number?: string;
-    status?: "PENDING" | "IN-PROGRESS" | "COMPLETED";
+    status?: "PENDING" | "IN_PROGRESS" | "COMPLETED";
 }
 
 export interface SystemStats {
@@ -142,21 +142,23 @@ export const sapApi = {
     async getMonitorsDrift(): Promise<MonitorsDrift> {
         const response: AxiosResponse<MonitorsDrift> = await apiClient.get('/v1/monitors/drift');
         return response.data;
+
+
     },
 
     // Get monitors model drift information
     async getMonitorsModelDrift(): Promise<MonitorsModelDrift> {
         const response: AxiosResponse<MonitorsModelDrift> = await apiClient.get('/v1/monitors/model-drift');
         return response.data;
-    }
+    },
 
-    // // Update work order status in SAP PM
-    // async updateWorkOrderStatus(orderId: string, status: WorkOrder["status"]): Promise<WorkOrder> {
-    //     const response: AxiosResponse<WorkOrder> = await apiClient.patch(`/sap/work-orders/${orderId}/status`, {
-    //         status,
-    //     });
-    //     return response.data;
-    // },
+    // Update work order status in SAP PM
+    async updateWorkOrderStatus(orderId: string, status: WorkOrder["status"]): Promise<WorkOrder> {
+        const response: AxiosResponse<WorkOrder> = await apiClient.patch(`/v1/work-orders/${orderId}/status`, {
+            status,
+        });
+        return response.data;
+    },
 
     // // Sync asset data from SAP PM
     // async syncAssetData(): Promise<SyncResult> {
