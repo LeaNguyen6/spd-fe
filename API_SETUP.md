@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project uses Axios for HTTP requests with authentication token management, automatic token refresh, and real API integration for SAP PM operations. The system provides seamless authentication flows with JWT tokens and comprehensive error handling.
+This project uses Axios for HTTP requests with authentication token management, automatic token refresh, and API integration for SAP PM operations. The system provides seamless authentication flows with JWT tokens and comprehensive error handling.
 
 ## Installation
 
@@ -36,13 +36,21 @@ src/
 │   └── apiClient.ts          # Axios configuration with interceptors and token refresh
 ├── services/
 │   ├── index.ts              # Service exports and type definitions
-│   ├── sapApi.ts             # Real API service using Axios
+│   ├── sapApi.ts             # Main API service using Axios
 │   └── authApi.ts            # Authentication API service with token management
 ├── hooks/
-│   └── useAuth.tsx           # Authentication context and hooks
+│   ├── useAuth.tsx           # Authentication context and hooks
+│   ├── use-mobile.tsx        # Mobile detection hook
+│   └── use-toast.ts          # Toast notification hook
 ├── components/
+│   ├── ui/                   # Reusable UI components (Button, Input, etc.)
 │   ├── ProtectedRoute.tsx    # Route protection component
-│   └── ErrorBoundary.tsx     # Error handling component
+│   ├── ErrorBoundary.tsx     # Error handling component
+│   ├── AssetManagerDashboard.tsx
+│   ├── MaintenancePlannerDashboard.tsx
+│   ├── ReliabilityEngineerDashboard.tsx
+│   ├── WorkOrderCard.tsx
+│   └── ... (other components)
 └── types/
     └── roles.ts              # User role type definitions
 ```
@@ -58,7 +66,7 @@ src/
 
 ### 2. Service Layer (`src/services/`)
 
-- **Real API**: Axios-based service for production
+- **API Service**: Axios-based service for production
 - **Auth API**: User authentication and token management
 - **Type Safety**: Full TypeScript support for all API operations
 
@@ -85,14 +93,26 @@ import { apiService } from "@/services/index";
 // Get all assets
 const assets = await apiService.getAssets();
 
+// Get all work orders
+const workOrders = await apiService.getWorkOrders();
+
 // Create work order
 await apiService.createWorkOrder({
   asset_id: "ASSET-123",
   type: "Preventive Maintenance",
-  priority: "high",
+  priority: "HIGH",
   assigned_to: "USER-456",
   scheduled_date: "2024-01-15T10:00:00Z",
 });
+
+// Update work order status
+await apiService.updateWorkOrderStatus("order-id", "COMPLETED");
+
+// Get reliability statistics
+const stats = await apiService.getReliabilityStats();
+
+// Get monitors drift data
+const driftData = await apiService.getMonitorsDrift();
 ```
 
 ### Authentication
@@ -106,8 +126,22 @@ const response = await authService.login({
   password: "password",
 });
 
+// Register new user
+await authService.register({
+  email: "user@example.com",
+  password: "password",
+  full_name: "John Doe",
+  role: "assets", // or "maintenance" or "reliability"
+});
+
 // Get user profile
 const user = await authService.getProfile();
+
+// Refresh token
+const newTokens = await authService.refreshToken();
+
+// Logout
+await authService.logout();
 ```
 
 ### Error Handling
@@ -125,22 +159,27 @@ try {
 
 ### Assets API
 
-- `GET /api/sap/assets` - Get all assets
-- `GET /api/sap/assets/:id` - Get asset by ID
-- `PATCH /api/sap/assets/:id/health` - Update asset health
+- `GET /api/v1/list-asset` - Get all assets with predictions
+- `GET /api/v1/reliability-stats` - Get reliability statistics
 
 ### Work Orders API
 
-- `GET /api/sap/work-orders` - Get all work orders
-- `POST /api/sap/work-orders` - Create new work order
-- `PATCH /api/sap/work-orders/:id/status` - Update work order status
+- `GET /api/v1/work-orders` - Get all work orders
+- `POST /api/v1/work-orders` - Create new work order
+- `PATCH /api/v1/work-orders/:id/status` - Update work order status
+
+### Monitoring API
+
+- `GET /api/v1/monitors/drift` - Get drift monitoring data
+- `GET /api/v1/monitors/model-drift` - Get model drift data
 
 ### Authentication API
 
 - `POST /api/v1/auth/login` - User login
-- `POST /api/v1/auth/logout` - User logout
+- `POST /api/v1/auth/register` - User registration
 - `GET /api/v1/auth/profile` - Get user profile
 - `POST /api/v1/auth/refresh` - Refresh authentication token
+- `POST /api/v1/auth/logout` - User logout
 
 ## Authentication Flow
 
@@ -170,7 +209,7 @@ interface Asset {
   category: string;
   healthScore: number;
   confidence: number;
-  nextMaintenance: string;
+  nextMaintenance: number;
   sapEquipmentNumber?: string;
 }
 
@@ -178,11 +217,40 @@ interface WorkOrder {
   id: string;
   assetId: string;
   type: string;
-  priority: "critical" | "high" | "medium" | "low";
+  priority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
   assignedTo: string;
   scheduledDate: string;
-  status: "pending" | "in_progress" | "completed";
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED";
   sapOrderNumber?: string;
+}
+
+interface CreateWorkOrderRequest {
+  asset_id: string;
+  type: string;
+  priority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+  assigned_to: string;
+  scheduled_date: string;
+  sap_order_number?: string;
+  status?: "PENDING" | "IN_PROGRESS" | "COMPLETED";
+}
+
+interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+interface RegisterRequest {
+  email: string;
+  password: string;
+  full_name: string;
+  role: "assets" | "maintenance" | "reliability";
+}
+
+interface User {
+  id: string;
+  email: string;
+  role: "assets" | "maintenance" | "reliability";
+  name: string;
 }
 ```
 
@@ -212,24 +280,6 @@ interface WorkOrder {
 
 Enable debug logging by setting `VITE_ENV=development` in your `.env` file.
 
-```
-src/
-├── lib/
-│   └── apiClient.ts          # Axios configuration with interceptors
-├── services/
-│   ├── index.ts              # Service selector (mock vs real API)
-│   ├── mockSapApi.ts         # Mock API service (existing)
-│   ├── sapApi.ts             # Real API service using Axios
-│   └── authApi.ts            # Authentication API service
-├── hooks/
-│   └── useAuth.tsx           # Authentication context and hooks
-├── components/
-│   ├── ProtectedRoute.tsx    # Route protection component
-│   └── ErrorBoundary.tsx     # Error handling component
-└── types/
-    └── roles.ts              # User role type definitions
-```
-
 ## Features
 
 ### 1. Axios Configuration (`src/lib/apiClient.ts`)
@@ -238,12 +288,11 @@ src/
 - Response interceptors for handling 401/403 errors
 - Configurable base URL and timeout
 - Automatic token cleanup on auth errors
+- Token refresh mechanism with queue management
 
 ### 2. Service Layer (`src/services/`)
 
-- **Service Selector**: Automatically switches between mock and real API based on environment
-- **Mock API**: Existing mock service for development
-- **Real API**: Axios-based service for production
+- **API Service**: Axios-based service for production
 - **Auth API**: User authentication and token management
 
 ### 3. Authentication (`src/hooks/useAuth.tsx`)
@@ -266,7 +315,7 @@ src/
 ```typescript
 import { apiService } from "@/services";
 
-// The service automatically uses mock or real API based on configuration
+// Get assets and work orders
 const assets = await apiService.getAssets();
 const workOrders = await apiService.getWorkOrders();
 ```
@@ -280,9 +329,6 @@ const { login, logout, user, isAuthenticated } = useAuth();
 
 // Login
 await login({ email: "user@example.com", password: "password" });
-
-// Logout
-logout();
 ```
 
 ### Protected Routes
@@ -306,34 +352,35 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 ### Manual Token Operations
 
 ```typescript
-import { tokenManager } from "@/services/authApi";
-
-// Check if authenticated
-const isAuth = tokenManager.isAuthenticated();
-
-// Get current token
-const token = tokenManager.getToken();
-
-// Clear tokens
-tokenManager.removeToken();
+// Token management is handled automatically by apiClient
+// But you can access token utilities if needed
 ```
 
 ## API Endpoints
 
 ### Authentication Endpoints
 
-- `POST /auth/login` - User login
-- `POST /auth/refresh` - Refresh token
-- `POST /auth/register` - Register new user
+- `POST /api/v1/auth/login` - User login
+- `POST /api/v1/auth/register` - User registration
+- `GET /api/v1/auth/profile` - Get user profile
+- `POST /api/v1/auth/refresh` - Refresh authentication token
+- `POST /api/v1/auth/logout` - User logout
 
-### SAP PM Endpoints
+### Asset Management Endpoints
 
-- `GET /sap/assets` - Get all assets
-- `GET /sap/work-orders` - Get all work orders
-- `POST /sap/work-orders` - Create work order
-- `PATCH /sap/work-orders/:id/status` - Update work order status
-- `POST /sap/sync/assets` - Sync asset data
-- `GET /sap/stats` - Get system statistics
+- `GET /api/v1/list-asset` - Get all assets with AI predictions
+- `GET /api/v1/reliability-stats` - Get system reliability statistics
+
+### Work Order Management Endpoints
+
+- `GET /api/v1/work-orders` - Get all work orders
+- `POST /api/v1/work-orders` - Create new work order
+- `PATCH /api/v1/work-orders/:id/status` - Update work order status
+
+### Monitoring & Analytics Endpoints
+
+- `GET /api/v1/monitors/drift` - Get data drift monitoring information
+- `GET /api/v1/monitors/model-drift` - Get model performance drift data
 
 ## Error Handling
 
@@ -359,42 +406,38 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 
 ### Development Mode
 
-- Uses mock API by default
 - Console logging for API calls
 - Error details in development builds
 
 ### Production Mode
 
-- Uses real API endpoints
+- Uses API endpoints
 - Minimal logging
 - Error boundary for graceful error handling
 
-## Migration from Mock API
+## Migration Guide
 
-The existing components using `mockSapApi` have been updated to use the service selector:
+The components have been updated to use the API service:
 
 ```typescript
-// Old way
-import { mockSapApi } from "@/services/mockSapApi";
-await mockSapApi.getAssets();
-
-// New way
+// Updated approach
 import { apiService } from "@/services";
 await apiService.getAssets();
 ```
 
-This allows seamless switching between mock and real APIs without code changes.
+This provides direct API integration without switching between different implementations.
 
 ## Environment Setup
 
 1. Copy `.env.example` to `.env`
 2. Update `VITE_API_BASE_URL` with your API server URL
-3. Set `VITE_USE_MOCK_API=false` when ready to use real API
-4. Ensure your API server supports the expected endpoints
+3. Ensure your API server supports the expected endpoints
 
 ## Security Considerations
 
-- Tokens are stored in localStorage (consider httpOnly cookies for production)
-- API calls include CSRF protection headers
+- Tokens are stored in localStorage and automatically managed by apiClient
+- API calls include proper authentication headers
+- Automatic token refresh prevents authentication expiration
 - Automatic token cleanup on authentication errors
-- Role-based access control for sensitive operations
+- Role-based access control for different user types (assets, maintenance, reliability)
+- Request/response interceptors handle errors gracefully

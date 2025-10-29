@@ -10,7 +10,7 @@ A modern, intelligent predictive maintenance management system built with React,
 - **Quality Monitoring**: Track precision and recall metrics for AI predictions
 - **SAP PM Integration**: Seamless integration with SAP Plant Maintenance systems
 - **Authentication & Authorization**: Secure user authentication with JWT tokens and role-based access control
-- **Responsive Design**: Mobile-friendly interface built with Tailwind CSS and Shadcn UI
+- **Responsive Design**: Mobile-friendly interface built with Tailwind CSS
 
 ## 📋 Table of Contents
 
@@ -58,16 +58,12 @@ VITE_API_BASE_URL=http://localhost:8080/api
 
 # Environment Mode
 VITE_ENV=development
-
-# Mock API Toggle (set to false for production)
-VITE_USE_MOCK_API=true
 ```
 
 ### Environment Variables Description
 
 - `VITE_API_BASE_URL`: Base URL for the backend API server
 - `VITE_ENV`: Current environment (development/production)
-- `VITE_USE_MOCK_API`: Toggle between mock and real API (useful for development)
 
 ## 🚀 Development
 
@@ -77,14 +73,13 @@ Start the development server:
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173`
+The application will be available at `http://localhost:3000`
 
 ### Development Features
 
 - **Hot Module Replacement (HMR)**: Instant updates without page refresh
 - **TypeScript Support**: Full type checking during development
 - **ESLint Integration**: Code quality checks
-- **Mock API**: Built-in mock API for development without backend
 
 ## 🏗️ Building for Production
 
@@ -116,7 +111,7 @@ spd-fe/
 │   └── robots.txt
 ├── src/
 │   ├── components/              # React components
-│   │   ├── ui/                  # Shadcn UI components
+│   │   ├── ui/                  # UI components
 │   │   ├── charts/              # Chart components (Bar, Line, Pie)
 │   │   ├── AssetHealthCard.tsx
 │   │   ├── AssetManagerDashboard.tsx
@@ -171,7 +166,7 @@ spd-fe/
 
 ## 🔌 API Integration
 
-The application supports both mock and real API modes. For detailed API setup and integration guide, see [API_SETUP.md](./API_SETUP.md).
+The application integrates with backend services for comprehensive asset management. For detailed API setup and integration guide, see [API_SETUP.md](./API_SETUP.md).
 
 ### Key Features
 
@@ -234,7 +229,6 @@ The application supports three main user roles:
 ### UI Components & Styling
 
 - **Tailwind CSS** - Utility-first CSS framework
-- **Shadcn UI** - Beautiful, accessible component library
 - **Radix UI** - Unstyled, accessible UI primitives
 - **Lucide React** - Icon library
 
@@ -301,12 +295,10 @@ For support and questions, please contact the development team or open an issue 
 ## 🙏 Acknowledgments
 
 - Built with [Vite](https://vitejs.dev/)
-- UI components from [Shadcn UI](https://ui.shadcn.com/)
 - Icons from [Lucide](https://lucide.dev/)
 
 ---
 
-**Current Branch**: `develop`  
-**Repository**: [LeaNguyen6/spd-fe](https://github.com/LeaNguyen6/spd-fe)
+**Current Branch**: `develop`
 
 For more detailed API documentation, please refer to [API_SETUP.md](./API_SETUP.md)
