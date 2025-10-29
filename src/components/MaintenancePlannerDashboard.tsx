@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import MetricCard from "@/components/MetricCard";
 import WorkOrderCard from "@/components/WorkOrderCard";
 import CreateWorkOrderDialog from "@/components/CreateWorkOrderDialog";
-import { Activity, TrendingUp, Wrench, RefreshCw, CheckCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Activity, TrendingUp, Wrench, CheckCircle, Loader2 } from "lucide-react";
 import { apiService, type Asset, type WorkOrder } from "@/services/index";
 import { toast } from "@/hooks/use-toast";
 
@@ -16,7 +15,7 @@ interface NormalizedWorkOrder {
     priority: "critical" | "high" | "medium" | "low";
     assignedTo: string;
     scheduledDate: string;
-    status: "PENDING" | "IN-PROGRESS" | "COMPLETED";
+    status: "PENDING" | "IN_PROGRESS" | "COMPLETED";
     sapOrderNumber?: string;
 }
 
@@ -93,7 +92,7 @@ const MaintenancePlannerDashboard = () => {
                 priority: order.priority.toLowerCase() as "critical" | "high" | "medium" | "low",
                 assignedTo: order.assignedTo,
                 scheduledDate: order.scheduledDate,
-                status: order.status, // Keep uppercase from API
+                status: order.status, // Already in correct format
                 sapOrderNumber: order.sapOrderNumber
             }));
 
@@ -142,11 +141,18 @@ const MaintenancePlannerDashboard = () => {
 
             <div>
                 <h3 className="text-xl font-semibold mb-4">Active Work Orders</h3>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {workOrders.map((order) => (
-                        <WorkOrderCard key={order.id} {...order} />
-                    ))}
-                </div>
+                {loading ? (
+                    <div className="flex justify-center items-center py-12">
+                        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                        <span className="ml-3 text-muted-foreground">Loading work orders...</span>
+                    </div>
+                ) : (
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        {workOrders.map((order) => (
+                            <WorkOrderCard key={order.id} {...order} onStatusUpdated={loadWorkOrders} />
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

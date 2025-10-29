@@ -2,7 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, User } from "lucide-react";
-
+import { sapApi } from "@/services/sapApi";
+type Status = "PENDING" | "IN_PROGRESS" | "COMPLETED"
 interface WorkOrderCardProps {
   id: string;
   assetId: string;
@@ -11,10 +12,14 @@ interface WorkOrderCardProps {
   priority: "low" | "medium" | "high" | "critical";
   assignedTo: string;
   scheduledDate: string;
-  status: "PENDING" | "IN-PROGRESS" | "COMPLETED";
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED";
+  onStatusUpdated?: () => void;
 }
 
-const WorkOrderCard = ({ assetId, type, priority, assignedTo, scheduledDate, status }: WorkOrderCardProps) => {
+import { useState } from "react";
+
+const WorkOrderCard = ({ id, assetId, type, priority, assignedTo, scheduledDate, status, onStatusUpdated }: WorkOrderCardProps) => {
+  const [loading, setLoading] = useState(false);
   const priorityVariant = {
     low: "white",
     medium: "default",
@@ -24,10 +29,19 @@ const WorkOrderCard = ({ assetId, type, priority, assignedTo, scheduledDate, sta
 
   const statusVariant = {
     "PENDING": "secondary",
-    "IN-PROGRESS": "default",
+    "IN_PROGRESS": "default",
     "COMPLETED": "success",
   };
-
+  const onStatusUpdate = async (workOrderId: string, status: Status) => {
+    setLoading(true);
+    try {
+      await sapApi.updateWorkOrderStatus(workOrderId, status);
+      // Call the callback to refresh data
+      onStatusUpdated?.();
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <Card className="shadow-card hover:shadow-elevated transition-shadow">
       <CardHeader>
@@ -50,11 +64,26 @@ const WorkOrderCard = ({ assetId, type, priority, assignedTo, scheduledDate, sta
           <User className="w-4 h-4 mr-2" />
           {assignedTo}
         </div>
-        <div className="flex items-center justify-between pt-2 border-t">
+        <div className="flex items-center justify-between pt-2 border-t h-12">
           <Badge variant={statusVariant[status] as "default"}>
-            {status === "IN-PROGRESS" ? "In Progress" : status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()}
+            {status === "IN_PROGRESS" ? "In Progress" : status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()}
           </Badge>
-          {/* <Button size="sm" variant="outline">Edit</Button> */}
+          {status === "PENDING" && (
+            <Button size="sm" variant="outline" onClick={() => onStatusUpdate(id, "IN_PROGRESS")}
+              disabled={loading}
+            >
+              {loading ? <span className="animate-spin mr-2 w-3 h-3 border-2 border-t-transparent border-current rounded-full inline-block" /> : null}
+              Start
+            </Button>
+          )}
+          {status === "IN_PROGRESS" && (
+            <Button size="sm" variant="outline" onClick={() => onStatusUpdate(id, "COMPLETED")}
+              disabled={loading}
+            >
+              {loading ? <span className="animate-spin mr-2 w-3 h-3 border-2 border-t-transparent border-current rounded-full inline-block" /> : null}
+              Done
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>

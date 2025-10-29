@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import MetricCard from "@/components/MetricCard";
 import AssetHealthCard from "@/components/AssetHealthCard";
-import { Activity, AlertTriangle, TrendingUp, Wrench, RefreshCw } from "lucide-react";
+import { Activity, AlertTriangle, TrendingUp, Wrench, RefreshCw, Loader2 } from "lucide-react";
 import { apiService, type Asset, type WorkOrder } from "@/services/index";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
@@ -18,7 +18,7 @@ const AssetManagerDashboard = () => {
     // Calculate pending replacements from work orders
     const getPendingReplacements = () => {
         return workOrders.filter(order =>
-            order.status === 'PENDING' || order.status === 'IN-PROGRESS'
+            order.status === 'PENDING' || order.status === 'IN_PROGRESS'
         ).length;
     };
 
@@ -87,21 +87,30 @@ const AssetManagerDashboard = () => {
 
             <div>
                 <h3 className="text-xl font-semibold mb-4">Asset Health Overview</h3>
-                <div className="grid gap-4 md:grid-cols-2">
-                    {displayedAssets.map((asset) => (
-                        <AssetHealthCard key={asset.assetId} {...asset} />
-                    ))}
-                </div>
-                {showLoadMore && (
-                    <div className="flex justify-center mt-6">
-                        <Button
-                            onClick={handleLoadMore}
-                            variant="outline"
-                            className="px-8 py-2"
-                        >
-                            Load More Assets ({assets.length - displayCount} remaining)
-                        </Button>
+                {loading ? (
+                    <div className="flex justify-center items-center py-12">
+                        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                        <span className="ml-3 text-muted-foreground">Loading assets...</span>
                     </div>
+                ) : (
+                    <>
+                        <div className="grid gap-4 md:grid-cols-2">
+                            {displayedAssets.map((asset) => (
+                                <AssetHealthCard key={asset.assetId} {...asset} />
+                            ))}
+                        </div>
+                        {showLoadMore && (
+                            <div className="flex justify-center mt-6">
+                                <Button
+                                    onClick={handleLoadMore}
+                                    variant="outline"
+                                    className="px-8 py-2"
+                                >
+                                    Load More Assets ({assets.length - displayCount} remaining)
+                                </Button>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>
