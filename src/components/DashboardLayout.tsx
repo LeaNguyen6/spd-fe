@@ -40,7 +40,7 @@ const DashboardLayout = ({ children, userRole, onLogout }: DashboardLayoutProps)
               <Badge
                 variant="secondary"
                 className="hidden md:flex items-center gap-2 px-3 py-1 cursor-pointer hover:bg-secondary/80 transition-colors"
-                onClick={() => navigate('/role-selection')}
+              // onClick={() => navigate('/role-selection')}
               >
                 <RoleIcon className="w-4 h-4" />
                 {currentRole.label}
