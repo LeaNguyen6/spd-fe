@@ -56,8 +56,22 @@ const QualityMonitoring = () => {
         { name: 'Critical', value: monitorsDrift.data_quality.critical_issue_engines, fill: 'hsl(var(--destructive))' },
     ] : [];
 
-    // Critical Issues from API
-    const criticalIssues = monitorsDrift?.critical_issues || [];
+    // Critical Issues from API - sorted by severity priority
+    const getSeverityPriority = (severity: string) => {
+        switch (severity.toLowerCase()) {
+            case 'critical': return 1;
+            case 'high': return 2;
+            case 'medium': return 3;
+            case 'low': return 4;
+            default: return 5;
+        }
+    };
+
+    const criticalIssues = monitorsDrift?.critical_issues.sort((a, b) => {
+        const priorityA = getSeverityPriority(a.severity);
+        const priorityB = getSeverityPriority(b.severity);
+        return priorityA - priorityB;
+    }) || [];
 
     // Calculate data quality score
     const dataQualityScore = monitorsDrift?.data_quality.score
@@ -277,6 +291,7 @@ const QualityMonitoring = () => {
                         emptyMessage="No critical issues found"
                         pagination={{
                             enabled: true,
+                            pageSize: 10
                         }}
                     />
                 </CardContent>
