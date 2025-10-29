@@ -200,7 +200,7 @@ const QualityMonitoring = () => {
                         {
                             missingValuesData.length === 0 ? (
                                 <div className="my-12 text-sm text-center text-muted-foreground">
-                                    No data available
+                                    No Missing Values Data
                                 </div>
                             ) : (<BarChart
                                 data={missingValuesData}
@@ -221,7 +221,7 @@ const QualityMonitoring = () => {
                     <CardContent>
                         {outliersData.length === 0 ? (
                             <div className="my-12 text-sm text-center text-muted-foreground">
-                                No data available
+                                No Outliers Data
                             </div>
                         ) : (<BarChart
                             data={outliersData}
@@ -244,7 +244,7 @@ const QualityMonitoring = () => {
                     <CardContent>
                         {dataDriftData.length === 0 ? (
                             <div className="my-12 text-sm text-center text-muted-foreground">
-                                No data available
+                                No Drift Engine
                             </div>
                         ) : (
                             <BarChart
