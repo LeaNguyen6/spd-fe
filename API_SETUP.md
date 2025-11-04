@@ -159,7 +159,7 @@ try {
 
 ### Assets API
 
-- `GET /api/v1/list-asset` - Get all assets with predictions
+- `GET /api/v1/assets` - Get all assets with predictions
 - `GET /api/v1/reliability-stats` - Get reliability statistics
 
 ### Work Orders API
@@ -368,7 +368,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 
 ### Asset Management Endpoints
 
-- `GET /api/v1/list-asset` - Get all assets with AI predictions
+- `GET /api/v1/assets` - Get all assets with AI predictions
 - `GET /api/v1/reliability-stats` - Get system reliability statistics
 
 ### Work Order Management Endpoints

@@ -76,7 +76,7 @@ const QualityMonitoring = () => {
     // Calculate data quality score
     const dataQualityScore = monitorsDrift?.data_quality.score
         ? `${monitorsDrift.data_quality.score.toFixed(1)}%`
-        : 'N/A';
+        : '0';
 
     const healthyFeatures = monitorsDrift?.data_quality.healthy_engines || 0;
     const totalFeatures = monitorsDrift?.data_quality.total_engines || 0;
@@ -87,10 +87,10 @@ const QualityMonitoring = () => {
         : 0;
     const modelStability = monitorsModelDrift?.total_engines
         ? `${((stableEngines / monitorsModelDrift.total_engines) * 100).toFixed(0)}%`
-        : 'N/A';
+        : '0%';
 
     // Count critical issues
-    const criticalIssuesCount = monitorsDrift?.critical_issues.length || 0;
+    const criticalIssuesCount = monitorsDrift?.data_quality.critical_issues || 0;
 
     const getSeverityVariant = (severity: string) => {
         switch (severity.toLowerCase()) {

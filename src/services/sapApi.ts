@@ -81,6 +81,7 @@ export interface CriticalIssue {
 
 export interface DataQuality {
     critical_issue_engines: number;
+    critical_issues: number;
     healthy_engines: number;
     medium_issue_engines: number;
     score: number;
@@ -109,7 +110,7 @@ export interface MonitorsModelDrift {
 export const sapApi = {
     // Get all assets from SAP PM
     async getAssets(): Promise<Asset[]> {
-        const response: AxiosResponse<AssetResponse[]> = await apiClient.get('/v1/list-asset');
+        const response: AxiosResponse<AssetResponse[]> = await apiClient.get('/v1/assets');
         return response.data.map(asset => ({
             assetId: String(asset.asset_id),
             assetName: asset.asset_name,
