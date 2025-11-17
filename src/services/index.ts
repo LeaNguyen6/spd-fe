@@ -13,7 +13,14 @@ export type {
     CreateWorkOrderRequest,
     SystemStats,
     SyncResult,
-    ReliabilityStats
+    ReliabilityStats,
+    RetrainRequest,
+    RetrainResponse,
+    ModelSelectionRequest,
+    ModelSelectionResponse,
+    DatasetListResponse,
+    Model,
+    ModelListResponse
 } from './sapApi';
 
 export type {

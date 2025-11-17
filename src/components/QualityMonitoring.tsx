@@ -7,6 +7,7 @@ import TableData, { TableColumn } from "@/components/TableData";
 import { AlertTriangle, CheckCircle, Clock, Database } from "lucide-react";
 import { useEffect, useState } from "react";
 import { sapApi, MonitorsDrift, MonitorsModelDrift } from "@/services/sapApi";
+import RetrainModel from "./RetrainModel";
 
 const QualityMonitoring = () => {
     const [monitorsDrift, setMonitorsDrift] = useState<MonitorsDrift | null>(null);
@@ -189,7 +190,7 @@ const QualityMonitoring = () => {
                     variant="destructive"
                 />
             </div>
-
+            <RetrainModel />
             {/* Charts Row */}
             <div className="grid gap-4 md:grid-cols-2">
                 <Card>
