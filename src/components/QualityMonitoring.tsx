@@ -7,29 +7,30 @@ import TableData, { TableColumn } from "@/components/TableData";
 import { AlertTriangle, CheckCircle, Clock, Database } from "lucide-react";
 import { useEffect, useState } from "react";
 import { sapApi, MonitorsDrift, MonitorsModelDrift } from "@/services/sapApi";
+import RetrainModel from "./RetrainModel";
+import SelectModelDialog from "./SelectModelDialog";
 
 const QualityMonitoring = () => {
     const [monitorsDrift, setMonitorsDrift] = useState<MonitorsDrift | null>(null);
     const [monitorsModelDrift, setMonitorsModelDrift] = useState<MonitorsModelDrift | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const fetchMonitorsData = async () => {
+        try {
+            setIsLoading(true);
+            const [driftData, modelDriftData] = await Promise.all([
+                sapApi.getMonitorsDrift(),
+                sapApi.getMonitorsModelDrift()
+            ]);
+            setMonitorsDrift(driftData);
+            setMonitorsModelDrift(modelDriftData);
+        } catch (error) {
+            console.error("Failed to fetch monitors data:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchMonitorsData = async () => {
-            try {
-                setIsLoading(true);
-                const [driftData, modelDriftData] = await Promise.all([
-                    sapApi.getMonitorsDrift(),
-                    sapApi.getMonitorsModelDrift()
-                ]);
-                setMonitorsDrift(driftData);
-                setMonitorsModelDrift(modelDriftData);
-            } catch (error) {
-                console.error("Failed to fetch monitors data:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
         fetchMonitorsData();
     }, []);
     // Transform API data for charts
@@ -189,7 +190,10 @@ const QualityMonitoring = () => {
                     variant="destructive"
                 />
             </div>
-
+            <div className="flex gap-2">
+                <RetrainModel />
+                <SelectModelDialog onModelSelected={fetchMonitorsData} />
+            </div>
             {/* Charts Row */}
             <div className="grid gap-4 md:grid-cols-2">
                 <Card>

@@ -106,6 +106,52 @@ export interface MonitorsModelDrift {
     unstable_engines: number;
 }
 
+export interface RetrainRequest {
+    partition?: string;
+    retrain_classification?: boolean;
+    retrain_regression?: boolean;
+}
+
+export interface RetrainResponse {
+    message: string;
+    status: string;
+}
+
+export interface ModelSelectionRequest {
+    classification_model?: string;
+    regression_model?: string;
+}
+
+export interface ModelSelectionResponse {
+    message: string;
+    status: string;
+}
+
+export interface DatasetListResponse {
+    data: {
+        list: string[];
+    };
+    metadata: {
+        code: number;
+    };
+}
+
+export interface Model {
+    model_name: string;
+    model_type: "classification" | "regression";
+    status: string;
+    artifact_path: string;
+    metrics: Record<string, unknown>;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface ModelListResponse {
+    data: {
+        models: Model[];
+    }
+}
+
 // Real API service using Axios
 export const sapApi = {
     // Get all assets from SAP PM
@@ -161,6 +207,28 @@ export const sapApi = {
         return response.data;
     },
 
+    // Retrain AI model with new dataset
+    async retrainModel(request: RetrainRequest): Promise<RetrainResponse> {
+        const response: AxiosResponse<RetrainResponse> = await apiClient.post('/v1/training/retrain', request);
+        return response.data;
+    },
+
+    // Get list of available datasets for training AI model
+    async getDatasetList(): Promise<DatasetListResponse> {
+        const response: AxiosResponse<DatasetListResponse> = await apiClient.get('/v1/training/dataset-list');
+        return response.data;
+    },
+
+    // Get list of available AI models
+    async getModelList(): Promise<ModelListResponse> {
+        const response: AxiosResponse<ModelListResponse> = await apiClient.get('/v1/training/registries');
+        return response.data;
+    },
+    // Select AI model for classification and regression
+    async selectModel(request: ModelSelectionRequest): Promise<ModelSelectionResponse> {
+        const response: AxiosResponse<ModelSelectionResponse> = await apiClient.post('/v1/training/model-selection', request);
+        return response.data;
+    },
     // // Sync asset data from SAP PM
     // async syncAssetData(): Promise<SyncResult> {
     //     const response: AxiosResponse<SyncResult> = await apiClient.post('/sap/sync/assets');
