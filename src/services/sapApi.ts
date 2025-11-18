@@ -147,7 +147,9 @@ export interface Model {
 }
 
 export interface ModelListResponse {
-    models: Model[];
+    data: {
+        models: Model[];
+    }
 }
 
 // Real API service using Axios
