@@ -44,6 +44,7 @@ const ModelPerformance = () => {
   const fetchPerformanceData = async () => {
     try {
       setIsLoading(true);
+      // TODO: Handle call API to refresh data after selection
       loadReliabilityStats();
     } catch (error) {
       console.error("Failed to fetch performance data:", error);
