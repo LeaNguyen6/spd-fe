@@ -227,7 +227,14 @@ export const sapApi = {
     // Get list of available AI models
     async getModelList(): Promise<ModelListResponse> {
         const response: AxiosResponse<ModelListResponse> = await apiClient.get('/v1/training/registries');
-        return response.data;
+		const sortedResponse: ModelListResponse = {
+		  data: {
+		    models: response.data.data.models.sort(
+		      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+		    ) as Model[]
+		  }
+		};
+		return sortedResponse;
     },
     // Select AI model for classification and regression
     async selectModel(request: ModelSelectionRequest): Promise<ModelSelectionResponse> {
