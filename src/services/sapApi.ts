@@ -185,6 +185,11 @@ export const sapApi = {
         return response.data;
     },
 
+    async getReliabilityStatsTrigger(): Promise<ReliabilityStats> {
+        const response: AxiosResponse<ReliabilityStats> = await apiClient.get('/v1/reliability-stats/trigger');
+        return response.data;
+    },
+
     // Get monitors drift information
     async getMonitorsDrift(): Promise<MonitorsDrift> {
         const response: AxiosResponse<MonitorsDrift> = await apiClient.get('/v1/monitors/drift');

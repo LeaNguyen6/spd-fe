@@ -41,13 +41,18 @@ const ModelPerformance = () => {
     }
   };
 
-  const fetchPerformanceData = async () => {
+  const loadReliabilityStatsTrigger = async () => {
     try {
       setIsLoading(true);
-      // TODO: Handle call API to refresh data after selection
-      loadReliabilityStats();
+      const stats = await apiService.getReliabilityStatsTrigger();
+      setReliabilityStats(stats);
     } catch (error) {
-      console.error("Failed to fetch performance data:", error);
+      console.error("Failed to load reliability stats trigger:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load reliability statistics",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +60,6 @@ const ModelPerformance = () => {
 
   useEffect(() => {
     loadReliabilityStats();
-    fetchPerformanceData();
   }, []);
 
   if (isLoading) {
@@ -104,7 +108,7 @@ const ModelPerformance = () => {
 
       <div className="flex gap-2">
         <RetrainModel />
-        <SelectModelDialog onModelSelected={fetchPerformanceData} />
+        <SelectModelDialog onModelSelected={loadReliabilityStatsTrigger} />
       </div>
 
       <div className="bg-card rounded-lg border p-6 shadow-card">
